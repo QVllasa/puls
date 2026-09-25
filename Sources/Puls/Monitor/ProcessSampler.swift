@@ -22,11 +22,16 @@ enum ProcessSampler {
             guard parts.count == 4, let pid = Int32(parts[0]), pid != ownPID,
                   let cpu = Double(parts[1].replacingOccurrences(of: ",", with: ".")),
                   let rss = UInt64(parts[2]) else { continue }
-            rows.append(ProcessRow(id: pid, name: displayName(pid: pid, fallback: String(parts[3])), cpu: cpu, memory: rss * 1024))
+            rows.append(ProcessRow(id: pid, name: String(parts[3]), cpu: cpu, memory: rss * 1024))
         }
-        let byCPU = rows.sorted { $0.cpu > $1.cpu }.prefix(limit)
-        let byMemory = rows.sorted { $0.memory > $1.memory }.prefix(limit)
-        return (Array(byCPU), Array(byMemory))
+        // Anzeigenamen nur für die wenigen angezeigten Prozesse auflösen.
+        let byCPU = rows.sorted { $0.cpu > $1.cpu }.prefix(limit).map(named)
+        let byMemory = rows.sorted { $0.memory > $1.memory }.prefix(limit).map(named)
+        return (byCPU, byMemory)
+    }
+
+    private static func named(_ row: ProcessRow) -> ProcessRow {
+        ProcessRow(id: row.id, name: displayName(pid: row.id, fallback: row.name), cpu: row.cpu, memory: row.memory)
     }
 
     private static func displayName(pid: Int32, fallback: String) -> String {

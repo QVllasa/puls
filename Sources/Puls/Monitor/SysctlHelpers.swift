@@ -1,6 +1,9 @@
 import Darwin
 import Foundation
 
+/// Einmal geholter Host-Port (jeder mach_host_self()-Aufruf erhöht sonst den Referenzzähler).
+let hostPort: mach_port_t = mach_host_self()
+
 enum Sysctl {
     static func int(_ name: String) -> Int? {
         var value: Int64 = 0

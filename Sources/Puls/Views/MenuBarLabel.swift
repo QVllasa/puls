@@ -130,6 +130,25 @@ struct MenuBarLabel: View {
         .frame(width: width, alignment: .leading)
     }
 
+    /// Fasst alles sichtbar Angezeigte zusammen; ist er unverändert, muss nicht neu gezeichnet werden.
+    var renderKey: String {
+        var parts = ["\(darkMenuBar)", "\(colored)"]
+        for metric in prefs.menuBarMetrics {
+            switch metric {
+            case .cpu: parts.append("c\(Int(monitor.cpu.total.rounded()))")
+            case .gpu: parts.append("g\(Int((monitor.gpu?.utilization ?? 0).rounded()))")
+            case .memory: parts.append("m\(Int(monitor.memory.usedPercent.rounded()))\(monitor.memory.pressure.rawValue)")
+            case .network: parts.append("n\(Fmt.compactRate(monitor.network.upload))|\(Fmt.compactRate(monitor.network.download))")
+            case .disk: parts.append("d" + (monitor.volumes.first.map { Fmt.storage($0.available) + "\(Int($0.usedPercent))" } ?? "-"))
+            case .temperature: parts.append("t" + (monitor.sensors.headline.map { Fmt.temperature($0, fahrenheit: prefs.useFahrenheit) } ?? "-"))
+            case .battery:
+                let b = monitor.battery
+                parts.append("b\(Int((b?.percent ?? 0).rounded()))\(b?.isCharging ?? false)\(b?.symbolName ?? "")")
+            }
+        }
+        return parts.joined(separator: ";")
+    }
+
     static func loadColor(_ percent: Double) -> Color {
         switch percent {
         case ..<60: Color(red: 0.20, green: 0.80, blue: 0.35)

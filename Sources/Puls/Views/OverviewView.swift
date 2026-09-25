@@ -81,7 +81,7 @@ struct Tile: View {
                 chart.frame(height: 26)
             }
             .padding(12)
-            .frame(maxWidth: .infinity, minHeight: 112, maxHeight: 112, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120, alignment: .topLeading)
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .card(highlighted: hovering)
             .scaleEffect(hovering ? 1.015 : 1)

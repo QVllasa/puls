@@ -19,8 +19,11 @@ enum GPUSampler {
 
         var service = IOIteratorNext(iterator)
         while service != 0 {
-            defer { IOObjectRelease(service); service = IOIteratorNext(iterator) }
-            guard let perf = property(service, "PerformanceStatistics") as? [String: Any] else { continue }
+            defer { IOObjectRelease(service) }
+            guard let perf = property(service, "PerformanceStatistics") as? [String: Any] else {
+                service = IOIteratorNext(iterator)
+                continue
+            }
             var stats = GPUStats()
             stats.utilization = number(perf["Device Utilization %"]) ?? 0
             stats.renderer = number(perf["Renderer Utilization %"]) ?? 0

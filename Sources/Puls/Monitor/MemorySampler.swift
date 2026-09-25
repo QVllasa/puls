@@ -36,7 +36,7 @@ enum MemorySampler {
         var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64_data_t>.stride / MemoryLayout<integer_t>.stride)
         let kr = withUnsafeMutablePointer(to: &vm) {
             $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
+                host_statistics64(hostPort, HOST_VM_INFO64, $0, &count)
             }
         }
         guard kr == KERN_SUCCESS else { return nil }

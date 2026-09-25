@@ -169,9 +169,20 @@ struct ProcessList: View {
 struct ProcessIcon: View {
     var pid: Int32
 
+    /// App-Symbole je Prozess-ID zwischenspeichern (sonst bei jedem Neuzeichnen ein LaunchServices-Aufruf).
+    @MainActor private static var cache: [Int32: NSImage?] = [:]
+
+    @MainActor private static func icon(for pid: Int32) -> NSImage? {
+        if let cached = cache[pid] { return cached }
+        if cache.count > 200 { cache.removeAll() }
+        let icon = NSRunningApplication(processIdentifier: pid)?.icon
+        cache[pid] = icon
+        return icon
+    }
+
     var body: some View {
         Group {
-            if let icon = NSRunningApplication(processIdentifier: pid)?.icon {
+            if let icon = Self.icon(for: pid) {
                 Image(nsImage: icon).resizable()
             } else {
                 Image(systemName: "gearshape.fill")

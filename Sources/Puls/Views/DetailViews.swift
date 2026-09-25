@@ -179,10 +179,10 @@ struct NetworkDetail: View {
         }
         SectionCard(title: "Verbindung", trailing: n.interfaceName) {
             InfoRow(label: "Art", value: n.interfaceKind)
-            InfoRow(label: "Lokale IP", value: n.localIPv4 ?? "–", copyable: true)
+            InfoRow(label: "Lokale IP", value: monitor.displayLocalIP ?? "–", copyable: true)
             if prefs.fetchPublicIP {
                 InfoRow(label: "Öffentliche IP",
-                        value: monitor.publicIP ?? (monitor.publicIPLoading ? "Wird ermittelt …" : "–"),
+                        value: monitor.displayPublicIP ?? (monitor.publicIPLoading ? "Wird ermittelt …" : "–"),
                         copyable: monitor.publicIP != nil)
             }
             Button("Netzwerkeinstellungen …") { Actions.openNetworkSettings() }
@@ -390,7 +390,7 @@ struct BatteryDetail: View {
                         .frame(width: 22)
                     Text(device.name).lineLimit(1)
                     Spacer()
-                    ForEach(device.levels, id: \.label) { level in
+                    ForEach(Array(device.levels.enumerated()), id: \.offset) { _, level in
                         HStack(spacing: 3) {
                             if !level.label.isEmpty {
                                 Text(level.label).font(.caption2).foregroundStyle(.tertiary)

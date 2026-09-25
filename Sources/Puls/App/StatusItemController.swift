@@ -11,6 +11,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var outsideClickMonitor: Any?
     private var keyMonitor: Any?
     private var lastLabelKey = ""
+    private var lastRenderKey = ""
     private var appearanceObservation: NSKeyValueObservation?
 
     init(monitor: SystemMonitor, prefs: Preferences) {
@@ -49,8 +50,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     func updateLabel() {
         guard let button = statusItem.button else { return }
         let dark = button.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let renderer = ImageRenderer(content: MenuBarLabel(monitor: monitor, prefs: prefs, darkMenuBar: dark))
-        renderer.scale = button.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
+        let label = MenuBarLabel(monitor: monitor, prefs: prefs, darkMenuBar: dark)
+        let scale = button.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
+        let renderKey = label.renderKey + ";\(scale)"
+        guard renderKey != lastRenderKey || button.image == nil else { return }
+        lastRenderKey = renderKey
+        let renderer = ImageRenderer(content: label)
+        renderer.scale = scale
         guard let image = renderer.nsImage else { return }
         image.isTemplate = !prefs.coloredMenuBar
         button.image = image
@@ -81,6 +87,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     func openPanel(route: Route? = nil) {
         if let route { state.route = route }
+        guard !monitor.isPanelVisible else { return }
         positionPanel()
         monitor.isPanelVisible = true
         panel.alphaValue = 0

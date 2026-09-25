@@ -35,6 +35,12 @@ final class SystemMonitor {
     private(set) var publicIPLoading = false
     private(set) var uptime: TimeInterval = 0
 
+    /// Für Screenshots: echte IP-Adressen durch Beispieladressen ersetzen.
+    @ObservationIgnored var redactsAddresses = false
+
+    var displayLocalIP: String? { redactsAddresses ? "192.168.1.23" : network.localIPv4 }
+    var displayPublicIP: String? { redactsAddresses && publicIP != nil ? "203.0.113.42" : publicIP }
+
     /// Wird vom Panel gesetzt; teure Messungen (Prozesse, Bluetooth, öffentliche IP) laufen nur dann.
     var isPanelVisible = false {
         didSet { if isPanelVisible && !oldValue { refreshOnOpen() } }
@@ -116,7 +122,7 @@ final class SystemMonitor {
             battery = BatterySampler.sample()
             if let b = battery { batteryHistory.append(b.percent) }
         }
-        if tickCount % 15 == 0 { volumes = DiskSampler.volumes() }
+        if tickCount % 15 == 0 { refreshVolumes() }
         if let bootTime { uptime = Date().timeIntervalSince(bootTime) }
 
         if isPanelVisible {
@@ -128,11 +134,18 @@ final class SystemMonitor {
     }
 
     private func refreshOnOpen() {
-        volumes = DiskSampler.volumes()
+        refreshVolumes()
         battery = BatterySampler.sample()
         refreshProcesses()
         if lastBluetooth.map({ Date().timeIntervalSince($0) > 30 }) ?? true { refreshBluetooth() }
         refreshPublicIPIfNeeded()
+    }
+
+    private func refreshVolumes() {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let result = DiskSampler.volumes()
+            DispatchQueue.main.async { self?.volumes = result }
+        }
     }
 
     private func refreshProcesses() {
@@ -171,6 +184,8 @@ final class SystemMonitor {
             let ip = await PublicIPFetcher.fetch()
             self.publicIP = ip
             self.publicIPLoading = false
+            // Fehlschlag (z. B. WLAN gerade erst verbunden): beim nächsten Tick erneut versuchen.
+            if ip == nil { self.lastPublicIP = (Date().addingTimeInterval(-280), self.network.interfaceName) }
         }
     }
 }

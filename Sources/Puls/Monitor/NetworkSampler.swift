@@ -33,6 +33,9 @@ final class NetworkSampler {
         stats.totalSent = counters.sent
 
         let now = ProcessInfo.processInfo.systemUptime
+        if let previous, previous.interface == primary, now - previous.time < 0.25 {
+            return stats // zu kurzes Messfenster, Bezugspunkt behalten
+        }
         if let previous, previous.interface == primary, now > previous.time,
            counters.received >= previous.received, counters.sent >= previous.sent {
             let dt = now - previous.time

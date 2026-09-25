@@ -2,7 +2,8 @@ import Foundation
 import IOKit
 
 struct BluetoothDevice: Identifiable, Equatable {
-    var id: String { name }
+    var id: String { address ?? name }
+    var address: String? = nil
     let name: String
     let kind: String
     /// Beschriftete Akkustände, z. B. ["Links": 80, "Rechts": 75, "Case": 40] oder ["": 64].
@@ -46,12 +47,13 @@ enum BluetoothSampler {
                         ("device_batteryLevelLeft", "L"), ("device_batteryLevelRight", "R"),
                         ("device_batteryLevelCase", "Case"),
                     ]
-                    for (key, label) in map {
+                    for (key, label) in map where !levels.contains(where: { $0.0 == label }) {
                         if let raw = props[key] as? String, let pct = Int(raw.filter(\.isNumber)) {
                             levels.append((label, pct))
                         }
                     }
-                    devices.append(BluetoothDevice(name: name, kind: props["device_minorType"] as? String ?? "",
+                    devices.append(BluetoothDevice(address: props["device_address"] as? String,
+                                                   name: name, kind: props["device_minorType"] as? String ?? "",
                                                    levels: levels.map { (label: $0.0, percent: $0.1) }))
                 }
             }
@@ -61,7 +63,8 @@ enum BluetoothSampler {
         for (name, percent) in hid {
             if let index = devices.firstIndex(where: { $0.name == name }) {
                 if devices[index].levels.isEmpty {
-                    devices[index] = BluetoothDevice(name: name, kind: devices[index].kind, levels: [(label: "", percent: percent)])
+                    devices[index] = BluetoothDevice(address: devices[index].address, name: name,
+                                                     kind: devices[index].kind, levels: [(label: "", percent: percent)])
                 }
             } else {
                 devices.append(BluetoothDevice(name: name, kind: "", levels: [(label: "", percent: percent)]))

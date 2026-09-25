@@ -35,6 +35,12 @@ struct BatteryStats: Equatable {
 }
 
 enum BatterySampler {
+    /// Stromwerte liegen teils als vorzeichenloses Zweierkomplement in der Registry.
+    private static func signed(_ value: Any?) -> Int? {
+        guard let number = value as? NSNumber else { return nil }
+        return Int(Int64(bitPattern: number.uint64Value))
+    }
+
     static func sample() -> BatteryStats? {
         guard let blob = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
               let list = IOPSCopyPowerSourcesList(blob)?.takeRetainedValue() as? [CFTypeRef] else { return nil }
@@ -70,7 +76,7 @@ enum BatterySampler {
                 }
                 if let t = dict["Temperature"] as? Int { stats.temperature = Double(t) / 100 }
                 if let mv = dict["Voltage"] as? Int {
-                    let ma = (dict["InstantAmperage"] as? Int) ?? (dict["Amperage"] as? Int) ?? 0
+                    let ma = signed(dict["InstantAmperage"]) ?? signed(dict["Amperage"]) ?? 0
                     let watts = Double(mv) * Double(ma) / 1_000_000
                     if abs(watts) >= 0.1 { stats.power = watts }
                 }

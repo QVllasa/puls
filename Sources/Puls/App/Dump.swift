@@ -21,6 +21,8 @@ enum Dump {
         let disk = DiskSampler()
         let sensors = SensorSampler()
         _ = cpu.sample(); _ = net.sample(); _ = disk.sampleThroughput()
+        Thread.sleep(forTimeInterval: 0.3)
+        _ = cpu.sample()
         Thread.sleep(forTimeInterval: 1)
 
         let info = MachineInfo.current
@@ -29,7 +31,7 @@ enum Dump {
         if let c = cpu.sample() {
             print(String(format: "CPU: %.1f%% (user %.1f, sys %.1f) load %.2f %.2f %.2f", c.total, c.user, c.system, c.load[0], c.load[1], c.load[2]))
             for g in cpu.groups {
-                print("  \(g.name) \(g.range):", g.range.map { String(format: "%.0f", c.cores[$0]) }.joined(separator: " "))
+                print("  \(g.name) \(g.range):", g.range.map { $0 < c.cores.count ? String(format: "%.0f", c.cores[$0]) : "–" }.joined(separator: " "))
             }
         }
         if let g = GPUSampler.sample() { print("GPU:", g.name, g.coreCount ?? -1, "Kerne,", g.utilization, "%, mem", g.memoryInUse) }

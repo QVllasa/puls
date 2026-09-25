@@ -56,7 +56,7 @@ final class CPUSampler {
         var cpuCount: natural_t = 0
         var info: processor_info_array_t?
         var infoCount: mach_msg_type_number_t = 0
-        guard host_processor_info(mach_host_self(), PROCESSOR_CPU_LOAD_INFO, &cpuCount, &info, &infoCount) == KERN_SUCCESS,
+        guard host_processor_info(hostPort, PROCESSOR_CPU_LOAD_INFO, &cpuCount, &info, &infoCount) == KERN_SUCCESS,
               let info else { return nil }
         defer {
             vm_deallocate(mach_task_self_, vm_address_t(bitPattern: info),
@@ -74,8 +74,10 @@ final class CPUSampler {
                 nice: UInt32(bitPattern: info[base + Int(CPU_STATE_NICE)])
             ))
         }
-        defer { previous = current }
-        guard previous.count == current.count else { return nil }
+        guard previous.count == current.count else {
+            previous = current
+            return nil
+        }
 
         var stats = CPUStats()
         var sumUser = 0.0, sumSystem = 0.0, sumIdle = 0.0
@@ -88,6 +90,10 @@ final class CPUSampler {
             sumUser += user; sumSystem += system; sumIdle += idle
         }
         let all = sumUser + sumSystem + sumIdle
+        // Zu kurzes Messfenster (z. B. direkt nach dem Start) liefert nur grobe 0/50/100-%-Werte:
+        // alten Bezugspunkt behalten und später erneut messen.
+        guard all >= Double(current.count) * 10 else { return nil }
+        previous = current
         if all > 0 {
             stats.user = sumUser / all * 100
             stats.system = sumSystem / all * 100

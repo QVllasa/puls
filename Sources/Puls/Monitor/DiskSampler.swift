@@ -26,6 +26,7 @@ final class DiskSampler {
         let (read, write) = Self.totalBytes()
         let now = ProcessInfo.processInfo.systemUptime
         var stats = DiskStats()
+        if let previous, now - previous.time < 0.25 { return stats }
         if let previous, now > previous.time, read >= previous.read, write >= previous.write {
             let dt = now - previous.time
             stats.read = Double(read - previous.read) / dt
@@ -59,7 +60,7 @@ final class DiskSampler {
         let keys: [URLResourceKey] = [
             .volumeNameKey, .volumeTotalCapacityKey, .volumeAvailableCapacityKey,
             .volumeAvailableCapacityForImportantUsageKey, .volumeIsInternalKey,
-            .volumeIsRemovableKey, .volumeIsBrowsableKey,
+            .volumeIsRemovableKey, .volumeIsBrowsableKey, .volumeIsLocalKey,
         ]
         let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: keys, options: [.skipHiddenVolumes]) ?? []
         var result: [VolumeInfo] = []
@@ -68,6 +69,7 @@ final class DiskSampler {
             if path.hasPrefix("/System/Volumes") || path.hasPrefix("/private/") { continue }
             guard let values = try? url.resourceValues(forKeys: Set(keys)),
                   values.volumeIsBrowsable ?? true,
+                  values.volumeIsLocal ?? true, // Netzlaufwerke auslassen – sie können hängen
                   let total = values.volumeTotalCapacity, total > 0 else { continue }
             let important = values.volumeAvailableCapacityForImportantUsage.map { UInt64(max(0, $0)) } ?? 0
             let available = important > 0 ? important : UInt64(max(0, values.volumeAvailableCapacity ?? 0))

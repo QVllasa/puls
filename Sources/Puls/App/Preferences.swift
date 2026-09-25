@@ -51,8 +51,11 @@ final class Preferences {
             }
             // Tatsächlichen Zustand übernehmen (z. B. wenn macOS die Freigabe verweigert hat).
             syncingLoginItem = true
-            launchAtLogin = SMAppService.mainApp.status == .enabled
+            launchAtLogin = Self.loginItemIsOn
             syncingLoginItem = false
+            if SMAppService.mainApp.status == .requiresApproval {
+                SMAppService.openSystemSettingsLoginItems()
+            }
         }
     }
 
@@ -72,7 +75,13 @@ final class Preferences {
         useFahrenheit = defaults.bool(forKey: "useFahrenheit")
         fetchPublicIP = defaults.bool(forKey: "fetchPublicIP")
         coloredMenuBar = defaults.bool(forKey: "coloredMenuBar")
-        launchAtLogin = SMAppService.mainApp.status == .enabled
+        launchAtLogin = Self.loginItemIsOn
+    }
+
+    /// Eingetragen gilt als „an“ – auch wenn macOS noch auf die Freigabe in den Systemeinstellungen wartet.
+    static var loginItemIsOn: Bool {
+        let status = SMAppService.mainApp.status
+        return status == .enabled || status == .requiresApproval
     }
 
     func isShown(_ metric: MenuBarMetric) -> Bool { menuBarMetrics.contains(metric) }
