@@ -8,3 +8,4 @@ dist-store/
 appstore/*.provisionprofile
 appstore/*.p8
 appstore/*.p12
+__pycache__/
