@@ -1,4 +1,17 @@
 import Foundation
+import ServiceManagement
+
+enum ServiceManagementStatus {
+    static func describe() -> String {
+        switch SMAppService.mainApp.status {
+        case .enabled: "aktiv"
+        case .notRegistered: "nicht eingetragen"
+        case .requiresApproval: "wartet auf Freigabe"
+        case .notFound: "nicht gefunden"
+        @unknown default: "unbekannt"
+        }
+    }
+}
 
 /// `Puls --dump` gibt alle Messwerte als Text aus (Diagnose ohne Oberfläche).
 enum Dump {
@@ -11,6 +24,7 @@ enum Dump {
         Thread.sleep(forTimeInterval: 1)
 
         let info = MachineInfo.current
+        print("Anmeldeobjekt-Status:", ServiceManagementStatus.describe())
         print("Mac:", info.computerName, "|", info.chip, "|", info.modelIdentifier, "|", info.osVersion)
         if let c = cpu.sample() {
             print(String(format: "CPU: %.1f%% (user %.1f, sys %.1f) load %.2f %.2f %.2f", c.total, c.user, c.system, c.load[0], c.load[1], c.load[2]))

@@ -40,16 +40,20 @@ final class Preferences {
     }
     var launchAtLogin: Bool {
         didSet {
-            guard launchAtLogin != oldValue else { return }
+            guard !syncingLoginItem, launchAtLogin != oldValue else { return }
             do {
                 if launchAtLogin { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
             } catch {
                 NSLog("Puls: Anmeldeobjekt konnte nicht geändert werden: \(error)")
             }
-            let actual = SMAppService.mainApp.status == .enabled
-            if actual != launchAtLogin { launchAtLogin = actual }
+            // Tatsächlichen Zustand übernehmen (z. B. wenn macOS die Freigabe verweigert hat).
+            syncingLoginItem = true
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+            syncingLoginItem = false
         }
     }
+
+    @ObservationIgnored private var syncingLoginItem = false
 
     private init() {
         defaults.register(defaults: [

@@ -42,33 +42,37 @@ final class Snapshot {
     }
 
     private func capture(name: String) {
-        typealias Fn = @convention(c) (CGRect, UInt32, UInt32, UInt32) -> Unmanaged<CGImage>?
-        guard let handle = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_NOW),
-              let symbol = dlsym(handle, "CGWindowListCreateImage") else { return }
-        let fn = unsafeBitCast(symbol, to: Fn.self)
-        // Bereich des Panels in globalen CG-Koordinaten (Ursprung oben links).
-        let primaryHeight = NSScreen.screens.first?.frame.height ?? 0
-        let f = panel.frame.insetBy(dx: -24, dy: -24)
-        let rect = CGRect(x: f.minX, y: primaryHeight - f.maxY, width: f.width, height: f.height)
-        // onScreenBelowWindow (4) | includingWindow (8): Panel samt Schreibtisch dahinter; bestResolution = 8
-        let options: UInt32 = CommandLine.arguments.contains("--window-only") ? 8 : 4 | 8
-        guard let image = fn(options == 8 ? .null : rect, options, UInt32(panel.windowNumber), options == 8 ? 1 | 8 : 8)?.takeRetainedValue() else {
+        guard let image = Self.captureImage(of: panel) else {
             print("Aufnahme fehlgeschlagen:", name)
             return
         }
-        write(image, name: name)
+        Self.write(image, to: directory.appendingPathComponent("\(name).png"))
+    }
+
+    /// Nimmt das eigene Fenster samt Schreibtisch dahinter auf (ohne Bildschirmaufnahme-Freigabe möglich).
+    static func captureImage(of panel: NSWindow, margin: CGFloat = 24, windowOnly: Bool = false) -> CGImage? {
+        typealias Fn = @convention(c) (CGRect, UInt32, UInt32, UInt32) -> Unmanaged<CGImage>?
+        guard let handle = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_NOW),
+              let symbol = dlsym(handle, "CGWindowListCreateImage") else { return nil }
+        let fn = unsafeBitCast(symbol, to: Fn.self)
+        // Bereich des Panels in globalen CG-Koordinaten (Ursprung oben links).
+        let primaryHeight = NSScreen.screens.first?.frame.height ?? 0
+        let f = panel.frame.insetBy(dx: -margin, dy: -margin)
+        let rect = CGRect(x: f.minX, y: primaryHeight - f.maxY, width: f.width, height: f.height)
+        // onScreenBelowWindow (4) | includingWindow (8): Panel samt Schreibtisch dahinter; bestResolution = 8
+        let options: UInt32 = windowOnly || CommandLine.arguments.contains("--window-only") ? 8 : 4 | 8
+        return fn(options == 8 ? .null : rect, options, UInt32(panel.windowNumber), options == 8 ? 1 | 8 : 8)?.takeRetainedValue()
     }
 
     private func saveMenuBarLabel() {
         let renderer = ImageRenderer(content: MenuBarLabel(monitor: monitor, prefs: .shared).padding(4).background(.white))
         renderer.scale = 3
-        if let image = renderer.cgImage { write(image, name: "menubar") }
+        if let image = renderer.cgImage { Self.write(image, to: directory.appendingPathComponent("menubar.png")) }
     }
 
-    private func write(_ image: CGImage, name: String) {
+    static func write(_ image: CGImage, to url: URL) {
         let rep = NSBitmapImageRep(cgImage: image)
         guard let data = rep.representation(using: .png, properties: [:]) else { return }
-        let url = directory.appendingPathComponent("\(name).png")
         try? data.write(to: url)
         print("gespeichert:", url.path, image.width, "x", image.height)
     }

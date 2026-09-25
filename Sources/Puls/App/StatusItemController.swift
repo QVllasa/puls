@@ -7,8 +7,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let monitor: SystemMonitor
     private let prefs: Preferences
     private let state = PanelState()
-    private lazy var panel: GlassPanel = makePanel()
+    private(set) lazy var panel: GlassPanel = makePanel()
     private var outsideClickMonitor: Any?
+    private var keyMonitor: Any?
     private var lastLabelKey = ""
 
     init(monitor: SystemMonitor, prefs: Preferences) {
@@ -88,12 +89,19 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             Task { @MainActor in self?.closePanel() }
         }
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard event.keyCode == 53 else { return event } // Escape
+            self?.closePanel()
+            return nil
+        }
     }
 
     func closePanel() {
         guard panel.isVisible else { return }
         if let outsideClickMonitor { NSEvent.removeMonitor(outsideClickMonitor) }
+        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
         outsideClickMonitor = nil
+        keyMonitor = nil
         monitor.isPanelVisible = false
         statusItem.button?.highlight(false)
         NSAnimationContext.runAnimationGroup({ ctx in
