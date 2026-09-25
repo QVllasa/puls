@@ -99,21 +99,25 @@ def prepare():
     # Altersfreigabe: alles „keine“ → 4+
     s, d = call("GET", f"/v1/appInfos/{info_id}/ageRatingDeclaration")
     decl = ok(s, d, "Altersfreigabe lesen")["data"]
-    new = {}
-    for k, v in decl["attributes"].items():
-        if isinstance(v, bool): new[k] = False
-        elif isinstance(v, str) or v is None:
-            if k in ("kidsAgeBand", "ageRatingOverride", "ageRatingOverrideV2", "koreaAgeRatingOverride", "developerAgeRatingInfoUrl"):
-                continue
-            new[k] = "NONE"
-    s, d = call("PATCH", f"/v1/ageRatingDeclarations/{decl['id']}", {"data": {"type": "ageRatingDeclarations",
-        "id": decl["id"], "attributes": new}})
-    if s >= 300:  # unbekannte Felder einzeln entfernen
+    booleans = {"advertising", "ageAssurance", "gambling", "healthOrWellnessTopics", "lootBox", "messagingAndChat",
+                "parentalControls", "unrestrictedWebAccess", "userGeneratedContent", "socialMedia", "socialMediaAgeRestricted"}
+    skip = {"kidsAgeBand", "ageRatingOverride", "ageRatingOverrideV2", "koreaAgeRatingOverride",
+            "gracRatingClassificationNumber", "developerAgeRatingInfoUrl"}
+    new = {k: (False if k in booleans else "NONE") for k in decl["attributes"] if k not in skip}
+    for _ in range(len(new) + 1):
+        s, d = call("PATCH", f"/v1/ageRatingDeclarations/{decl['id']}", {"data": {"type": "ageRatingDeclarations",
+            "id": decl["id"], "attributes": new}})
+        if s < 300:
+            break
+        # Feld mit falschem Typ umdrehen (Boolean <-> „NONE“) bzw. unbekanntes Feld entfernen
+        fixed = False
         for err in d.get("errors", []):
-            ptr = err.get("source", {}).get("pointer", "")
-            new.pop(ptr.rsplit("/", 1)[-1], None)
-        ok(*call("PATCH", f"/v1/ageRatingDeclarations/{decl['id']}", {"data": {"type": "ageRatingDeclarations",
-            "id": decl["id"], "attributes": new}}), "Altersfreigabe")
+            field = err.get("source", {}).get("pointer", "").rsplit("/", 1)[-1]
+            if field in new:
+                new[field] = "NONE" if isinstance(new[field], bool) else False
+                fixed = True
+        if not fixed:
+            ok(s, d, "Altersfreigabe")
     print("✓ Altersfreigabe (keine Einschränkungen)")
 
     # Preis: kostenlos
