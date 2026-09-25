@@ -11,6 +11,8 @@ BUNDLE_ID="com.vllasa.puls"
 APP_IDENTITY="${APP_IDENTITY:-Apple Distribution: Vllasa Ventures UG (haftungsbeschraenkt) ($TEAM)}"
 PKG_IDENTITY="${PKG_IDENTITY:-3rd Party Mac Developer Installer: Vllasa Ventures UG (haftungsbeschraenkt) ($TEAM)}"
 PROFILE="appstore/Puls_Mac_App_Store.provisionprofile"
+KEYCHAIN="${KEYCHAIN:-$HOME/.appstore-puls/puls-signing.keychain-db}"
+[[ -f "$HOME/.appstore-puls/keychain.pw" ]] && security unlock-keychain -p "$(cat "$HOME/.appstore-puls/keychain.pw")" "$KEYCHAIN"
 VERSION="${1:-$(cat VERSION)}"
 BUILD="$(git rev-list --count HEAD)"
 OUT="dist-store"
@@ -41,11 +43,11 @@ if nm -u "$APP/Contents/MacOS/Puls" | grep -E "IOHIDEvent|IOHIDService|IOService
 fi
 
 echo "▸ Signiere …"
-codesign --force --sign "$APP_IDENTITY" --entitlements appstore/Puls.entitlements --timestamp=none "$APP"
+codesign --force --keychain "$KEYCHAIN" --sign "$APP_IDENTITY" --entitlements appstore/Puls.entitlements --timestamp=none "$APP"
 codesign --verify --strict --deep "$APP"
 codesign -d --entitlements - "$APP" 2>/dev/null | grep -q "app-sandbox" || { echo "✗ Sandbox fehlt"; exit 1; }
 
 echo "▸ Erstelle Installationspaket …"
-productbuild --component "$APP" /Applications --sign "$PKG_IDENTITY" "$OUT/Puls-$VERSION.pkg"
+productbuild --component "$APP" /Applications --keychain "$KEYCHAIN" --sign "$PKG_IDENTITY" "$OUT/Puls-$VERSION.pkg"
 pkgutil --check-signature "$OUT/Puls-$VERSION.pkg" | head -3
 echo "✓ $OUT/Puls-$VERSION.pkg"
