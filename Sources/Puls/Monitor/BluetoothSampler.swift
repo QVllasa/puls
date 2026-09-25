@@ -1,4 +1,5 @@
 import Foundation
+import IOKit
 
 struct BluetoothDevice: Identifiable, Equatable {
     var id: String { name }
@@ -55,7 +56,36 @@ enum BluetoothSampler {
                 }
             }
         }
-        return devices.sorted { $0.name < $1.name }
+        // Magic Keyboard, Maus und Trackpad melden ihren Akkustand nur über IOKit.
+        let hid = hidBatteryLevels()
+        for (name, percent) in hid {
+            if let index = devices.firstIndex(where: { $0.name == name }) {
+                if devices[index].levels.isEmpty {
+                    devices[index] = BluetoothDevice(name: name, kind: devices[index].kind, levels: [(label: "", percent: percent)])
+                }
+            } else {
+                devices.append(BluetoothDevice(name: name, kind: "", levels: [(label: "", percent: percent)]))
+            }
+        }
+        return devices.filter { !$0.levels.isEmpty }.sorted { $0.name < $1.name }
+    }
+
+    private static func hidBatteryLevels() -> [String: Int] {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("AppleDeviceManagementHIDEventService"), &iterator) == KERN_SUCCESS else {
+            return [:]
+        }
+        defer { IOObjectRelease(iterator) }
+        var result: [String: Int] = [:]
+        var service = IOIteratorNext(iterator)
+        while service != 0 {
+            let name = IORegistryEntryCreateCFProperty(service, "Product" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? String
+            let percent = IORegistryEntryCreateCFProperty(service, "BatteryPercent" as CFString, kCFAllocatorDefault, 0)?.takeRetainedValue() as? Int
+            if let name, let percent { result[name] = percent }
+            IOObjectRelease(service)
+            service = IOIteratorNext(iterator)
+        }
+        return result
     }
 }
 

@@ -55,7 +55,7 @@ final class SensorSampler {
             stats.cpu = cpu.reduce(0, +) / Double(cpu.count)
             stats.cpuMax = cpu.max()
         }
-        let gpu = temps.filter { $0.key.localizedCaseInsensitiveContains("GPU") }.map(\.value)
+        let gpu = temps.filter { Self.isGPU($0.key) }.map(\.value)
         if !gpu.isEmpty { stats.gpu = gpu.reduce(0, +) / Double(gpu.count) }
         stats.battery = temps.first { $0.key.localizedCaseInsensitiveContains("battery") }?.value
         let ssd = temps.filter { $0.key.localizedCaseInsensitiveContains("NAND") }.map(\.value)
@@ -76,6 +76,16 @@ final class SensorSampler {
         return dict.mapValues(\.doubleValue).filter { $0.value > 0 && !$0.key.lowercased().contains("tcal") }
     }
 
+    /// „GPU MTR …“ (M1) bzw. „PMU TPxg“ (M2 und neuer) sind Grafik-Fühler.
+    private static func isGPU(_ name: String) -> Bool {
+        if name.localizedCaseInsensitiveContains("GPU") { return true }
+        return name.range(of: #"^PMU TP\d+g$"#, options: .regularExpression) != nil
+    }
+
+    private static func isSoC(_ name: String) -> Bool {
+        name.range(of: #"^PMU TP\d+s$"#, options: .regularExpression) != nil
+    }
+
     private static func isCPU(_ name: String) -> Bool {
         let n = name.lowercased()
         return n.contains("tdie") || n.contains("acc mtr") || n.contains("soc mtr") || n.contains("cpu")
@@ -84,6 +94,10 @@ final class SensorSampler {
     static func friendlyName(_ raw: String) -> String {
         let n = raw.lowercased()
         if n.contains("tdie") { return raw.replacingOccurrences(of: "PMU tdie", with: "CPU-Die ") }
+        if isGPU(raw), raw.hasPrefix("PMU TP") {
+            return "Grafik " + raw.dropFirst(6).filter(\.isNumber)
+        }
+        if isSoC(raw) { return "SoC " + raw.dropFirst(6).filter(\.isNumber) }
         if n.contains("tdev") { return raw.replacingOccurrences(of: "PMU tdev", with: "Chip ") }
         if n.contains("gas gauge battery") { return "Akku" }
         if n.contains("battery") { return "Akku " + raw.replacingOccurrences(of: "battery", with: "", options: .caseInsensitive).trimmingCharacters(in: .whitespaces) }

@@ -360,7 +360,7 @@ struct BatteryDetail: View {
                     InfoRow(label: "Maximale Kapazität", value: Fmt.percent(health))
                 }
                 if let condition = b.condition {
-                    InfoRow(label: "Bewertung", value: condition == "Good" ? "Gut" : condition)
+                    InfoRow(label: "Bewertung", value: Self.localizedCondition(condition))
                 }
                 if let cycles = b.cycleCount { InfoRow(label: "Ladezyklen", value: "\(cycles)") }
                 if let t = b.temperature { InfoRow(label: "Temperatur", value: Fmt.temperature(t, fahrenheit: prefs.useFahrenheit)) }
@@ -402,6 +402,18 @@ struct BatteryDetail: View {
                 }
                 .font(.callout)
             }
+        }
+    }
+}
+
+extension BatteryDetail {
+    static func localizedCondition(_ raw: String) -> String {
+        switch raw.lowercased() {
+        case "good", "normal": "Gut"
+        case "fair": "Mittel"
+        case "poor": "Schwach"
+        case "check battery", "service battery", "service recommended": "Service empfohlen"
+        default: raw
         }
     }
 }
