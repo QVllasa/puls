@@ -1,0 +1,23 @@
+{
+  "bundle_id": "com.vllasa.puls",
+  "sku": "PULS-MAC-001",
+  "primary_language": "de-DE",
+  "primary_category": "UTILITIES",
+  "secondary_category": "DEVELOPER_TOOLS",
+  "price": "free",
+  "age_rating": "4+",
+  "copyright": "2026 Vllasa Ventures UG (haftungsbeschränkt)",
+  "support_url": "https://qvllasa.github.io/puls/support.html",
+  "marketing_url": "https://qvllasa.github.io/puls/",
+  "privacy_url": "https://qvllasa.github.io/puls/datenschutz.html",
+  "contact_email": "info@vllasa.com",
+  "de-DE": {
+    "name": "Puls – Systemmonitor",
+    "subtitle": "Dein Mac auf einen Blick",
+    "promotional_text": "CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Menüleiste – in einem ruhigen Glas-Panel, gemacht für macOS Tahoe.",
+    "keywords": "systemmonitor,cpu,ram,arbeitsspeicher,netzwerk,menüleiste,gpu,akku,batterie,auslastung,monitor",
+    "whats_new": "Die erste Version von Puls.",
+    "description": "Puls zeigt dir, was in deinem Mac gerade passiert – ruhig, übersichtlich und direkt in der Menüleiste.\n\nEin Klick auf das Symbol öffnet ein Glas-Panel im Stil von macOS Tahoe. Jede Kachel zeigt einen Bereich deines Systems mit aktuellem Wert und Verlauf. Ein weiterer Klick führt zu den Details.\n\nWAS PULS ZEIGT\n\n• CPU: Gesamtauslastung, Nutzer- und Systemanteil, jeder Kern einzeln nach Kerntyp gruppiert, Systemlast über 1, 5 und 15 Minuten, Laufzeit seit dem Start.\n• Grafik: GPU-Auslastung, Renderer-Last und belegter Grafikspeicher.\n• Speicher: App-Speicher, fester und komprimierter Speicher, Cache, Speicherdruck und Auslagerung.\n• Netzwerk: Download und Upload live mit Verlauf, Spitzenwerte, Verbindungsart, lokale IP-Adresse und übertragene Datenmenge seit dem Start. Auf Wunsch auch die öffentliche IP-Adresse.\n• Festplatte: Lese- und Schreibrate live, alle Volumes mit freiem Speicherplatz.\n• Thermik & Energie: Thermischer Zustand des Mac, Leistungsaufnahme des Systems und Akku-Temperatur.\n• Batterie: Ladestand, Restlaufzeit, maximale Kapazität, Ladezyklen, Lade- und Entladeleistung sowie Akkustände von Magic Keyboard, Maus und Trackpad.\n\nDEINE MENÜLEISTE, DEINE WAHL\n\nBestimme selbst, welche Werte oben angezeigt werden: CPU, Grafik, Speicher, Netzwerk, Festplatte oder Batterie. Farbige Ampel-Indikatoren zeigen sofort, wenn etwas unter Last steht – oder du wählst die schlichte einfarbige Darstellung.\n\nEINFACH STATT ÜBERLADEN\n\nPuls verzichtet bewusst auf Dutzende Einstellungen. Ein Symbol, ein Panel, alles Wichtige auf einen Blick. Hell- und Dunkelmodus werden automatisch unterstützt.\n\nSPARSAM UND PRIVAT\n\nPuls braucht kaum Rechenleistung, sammelt keine Daten und kommt ohne Konto, Werbung oder Abo aus. Auf Wunsch startet Puls automatisch mit deinem Mac.",
+    "review_notes": "Puls ist eine reine Menüleisten-App (LSUIElement) und erscheint daher nicht im Dock. Beim ersten Start öffnet sich das Panel automatisch unter dem Puls-Symbol oben rechts in der Menüleiste. Danach öffnet ein Klick auf das Symbol das Panel, ein Rechtsklick zeigt ein Menü mit „Einstellungen“ und „Puls beenden“.\n\nFür die Nutzung ist kein Konto nötig. Alle Werte werden lokal über öffentliche macOS-Schnittstellen gelesen (host_statistics, sysctl, IOKit-Registry, IOPowerSources). Die App läuft in der App-Sandbox und nutzt nur die Berechtigung com.apple.security.network.client – ausschließlich für den optionalen, standardmäßig ausgeschalteten Abruf der öffentlichen IP-Adresse über api.ipify.org.\n\nDer Autostart wird nur nach ausdrücklicher Zustimmung des Nutzers eingerichtet (Frage beim ersten Start bzw. Schalter in den Einstellungen, via SMAppService)."
+  }
+}

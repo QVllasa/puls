@@ -38,6 +38,7 @@ final class SystemMonitor {
     /// Für Screenshots: echte IP-Adressen durch Beispieladressen ersetzen.
     @ObservationIgnored var redactsAddresses = false
 
+    var displayComputerName: String { redactsAddresses ? "MacBook Pro" : machine.computerName }
     var displayLocalIP: String? { redactsAddresses ? "192.168.1.23" : network.localIPv4 }
     var displayPublicIP: String? { redactsAddresses && publicIP != nil ? "203.0.113.42" : publicIP }
 
@@ -149,7 +150,7 @@ final class SystemMonitor {
     }
 
     private func refreshProcesses() {
-        guard !processesRunning else { return }
+        guard Flavor.hasProcesses, !processesRunning else { return }
         processesRunning = true
         DispatchQueue.global(qos: .utility).async { [weak self] in
             let result = ProcessSampler.sample()

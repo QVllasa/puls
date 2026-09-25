@@ -1,4 +1,6 @@
 #include "CSystem.h"
+
+#ifndef APPSTORE
 #include <string.h>
 
 #define KERNEL_INDEX_SMC      2
@@ -75,3 +77,14 @@ int smc_read_key(io_connect_t conn, const char *key, uint32_t *type, uint8_t *by
     memcpy(bytes, out.bytes, dataSize);
     return 0;
 }
+
+#else
+
+// Store-Version: kein Zugriff auf den SMC (in der Sandbox gesperrt).
+int smc_open(io_connect_t *conn) { (void)conn; return -1; }
+void smc_close(io_connect_t conn) { (void)conn; }
+int smc_read_key(io_connect_t conn, const char *key, uint32_t *type, uint8_t *bytes, uint32_t *size) {
+    (void)conn; (void)key; (void)type; (void)bytes; (void)size; return -1;
+}
+
+#endif

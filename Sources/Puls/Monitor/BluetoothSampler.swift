@@ -31,6 +31,24 @@ struct BluetoothDevice: Identifiable, Equatable {
 enum BluetoothSampler {
     /// Liest verbundene Geräte samt Akkustand über system_profiler (dauert ~1 s, daher selten aufrufen).
     static func sample() -> [BluetoothDevice] {
+        var devices: [BluetoothDevice] = Flavor.isAppStore ? [] : profilerDevices()
+        // Magic Keyboard, Maus und Trackpad melden ihren Akkustand nur über IOKit.
+        let hid = hidBatteryLevels()
+        for (name, percent) in hid {
+            if let index = devices.firstIndex(where: { $0.name == name }) {
+                if devices[index].levels.isEmpty {
+                    devices[index] = BluetoothDevice(address: devices[index].address, name: name,
+                                                     kind: devices[index].kind, levels: [(label: "", percent: percent)])
+                }
+            } else {
+                devices.append(BluetoothDevice(name: name, kind: "", levels: [(label: "", percent: percent)]))
+            }
+        }
+        return devices.filter { !$0.levels.isEmpty }.sorted { $0.name < $1.name }
+    }
+
+    /// AirPods & Co. über system_profiler (nur außerhalb der Sandbox möglich).
+    private static func profilerDevices() -> [BluetoothDevice] {
         guard let data = Shell.run("/usr/sbin/system_profiler", ["SPBluetoothDataType", "-json"], timeout: 15),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let sections = json["SPBluetoothDataType"] as? [[String: Any]] else { return [] }
@@ -58,19 +76,7 @@ enum BluetoothSampler {
                 }
             }
         }
-        // Magic Keyboard, Maus und Trackpad melden ihren Akkustand nur über IOKit.
-        let hid = hidBatteryLevels()
-        for (name, percent) in hid {
-            if let index = devices.firstIndex(where: { $0.name == name }) {
-                if devices[index].levels.isEmpty {
-                    devices[index] = BluetoothDevice(address: devices[index].address, name: name,
-                                                     kind: devices[index].kind, levels: [(label: "", percent: percent)])
-                }
-            } else {
-                devices.append(BluetoothDevice(name: name, kind: "", levels: [(label: "", percent: percent)]))
-            }
-        }
-        return devices.filter { !$0.levels.isEmpty }.sorted { $0.name < $1.name }
+        return devices
     }
 
     private static func hidBatteryLevels() -> [String: Int] {

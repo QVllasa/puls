@@ -7,7 +7,7 @@ struct SettingsView: View {
         @Bindable var prefs = prefs
         VStack(spacing: 10) {
             SectionCard(title: "In der Menüleiste zeigen") {
-                ForEach(MenuBarMetric.allCases) { metric in
+                ForEach(MenuBarMetric.available) { metric in
                     HStack(spacing: 10) {
                         MenuBarMetricIcon(metric: metric)
                         Text(metric.title)

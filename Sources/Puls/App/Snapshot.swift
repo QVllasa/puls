@@ -1,3 +1,4 @@
+#if !APPSTORE || SNAPSHOTS
 import AppKit
 import SwiftUI
 
@@ -91,3 +92,4 @@ final class Snapshot {
         print("gespeichert:", url.path, image.width, "x", image.height)
     }
 }
+#endif

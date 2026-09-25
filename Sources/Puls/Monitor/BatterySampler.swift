@@ -35,6 +35,23 @@ struct BatteryStats: Equatable {
 }
 
 enum BatterySampler {
+    /// Rohwerte des Akku-Treibers (auch in der Sandbox lesbar).
+    static func registry() -> [String: Any]? {
+        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
+        guard service != 0 else { return nil }
+        defer { IOObjectRelease(service) }
+        var props: Unmanaged<CFMutableDictionary>?
+        guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS else { return nil }
+        return props?.takeRetainedValue() as? [String: Any]
+    }
+
+    /// Leistungsaufnahme des gesamten Systems in Watt laut Akku-Telemetrie (nur Laptops).
+    static func systemLoadWatts(_ dict: [String: Any]? = registry()) -> Double? {
+        guard let telemetry = dict?["PowerTelemetryData"] as? [String: Any],
+              let milliwatts = signed(telemetry["SystemLoad"]), milliwatts > 0, milliwatts < 1_000_000 else { return nil }
+        return Double(milliwatts) / 1000
+    }
+
     /// Stromwerte liegen teils als vorzeichenloses Zweierkomplement in der Registry.
     private static func signed(_ value: Any?) -> Int? {
         guard let number = value as? NSNumber else { return nil }
@@ -63,12 +80,8 @@ enum BatterySampler {
         }
         guard var stats else { return nil }
 
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
-        if service != 0 {
-            defer { IOObjectRelease(service) }
-            var props: Unmanaged<CFMutableDictionary>?
-            if IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-               let dict = props?.takeRetainedValue() as? [String: Any] {
+        do {
+            if let dict = registry() {
                 stats.cycleCount = dict["CycleCount"] as? Int
                 if let design = dict["DesignCapacity"] as? Int, design > 0,
                    let raw = (dict["AppleRawMaxCapacity"] as? Int) ?? (dict["NominalChargeCapacity"] as? Int) {

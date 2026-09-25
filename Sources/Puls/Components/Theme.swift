@@ -12,7 +12,7 @@ enum Module: String, CaseIterable, Identifiable, Hashable {
         case .memory: "Speicher"
         case .network: "Netzwerk"
         case .disk: "Festplatte"
-        case .sensors: "Sensoren"
+        case .sensors: Flavor.isAppStore ? "Thermik" : "Sensoren"
         case .battery: "Batterie"
         }
     }

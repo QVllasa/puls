@@ -1,5 +1,7 @@
 #include "CSystem.h"
 
+#ifndef APPSTORE
+
 // Private, aber seit Jahren stabile IOKit-Funktionen (IOHIDEventSystemClient).
 typedef struct __IOHIDEvent *IOHIDEventRef;
 typedef struct __IOHIDServiceClient *IOHIDServiceClientRef;
@@ -67,3 +69,10 @@ CFDictionaryRef hid_copy_temperatures(void) {
     CFRelease(services);
     return result;
 }
+
+#else
+
+// Store-Version: keine privaten Schnittstellen.
+CFDictionaryRef hid_copy_temperatures(void) { return NULL; }
+
+#endif

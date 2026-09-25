@@ -14,10 +14,15 @@ struct OverviewView: View {
         }
     }
 
+    @Environment(Preferences.self) private var prefs
+
     var body: some View {
         let items = modules
         let rows = stride(from: 0, to: items.count, by: 2).map { Array(items[$0..<min($0 + 2, items.count)]) }
         ScrollView {
+            if Flavor.isAppStore && !prefs.loginItemQuestionAnswered {
+                LoginItemPrompt().padding(.bottom, 10)
+            }
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 ForEach(rows, id: \.self) { row in
                     GridRow {
@@ -106,7 +111,7 @@ struct Tile: View {
             guard let v = monitor.volumes.first else { return "–" }
             return Fmt.storage(v.available)
         case .sensors:
-            guard let t = monitor.sensors.headline else { return "–" }
+            guard let t = monitor.sensors.headline else { return monitor.sensors.thermalLabel }
             return Fmt.temperature(t, fahrenheit: prefs.useFahrenheit)
         case .battery: return Fmt.percent(monitor.battery?.percent ?? 0)
         }
@@ -126,9 +131,12 @@ struct Tile: View {
             return monitor.volumes.first.map { "frei · \($0.name)" }
         case .sensors:
             var parts: [String] = []
+            if monitor.sensors.headline == nil, let t = monitor.sensors.battery {
+                parts.append("Akku \(Fmt.temperature(t, fahrenheit: prefs.useFahrenheit))")
+            }
             if let fan = monitor.sensors.fans.first { parts.append(fan.rpm > 0 ? Fmt.rpm(fan.rpm) : "Lüfter aus") }
             if let p = monitor.sensors.systemPower { parts.append(Fmt.watts(p)) }
-            return parts.isEmpty ? "CPU" : parts.joined(separator: " · ")
+            return parts.isEmpty ? "Thermischer Zustand" : parts.joined(separator: " · ")
         case .battery:
             guard let b = monitor.battery else { return nil }
             if let minutes = b.minutesRemaining, !b.isFullyCharged {
@@ -159,11 +167,53 @@ struct Tile: View {
                 }
             }
         case .sensors:
-            Sparkline(values: monitor.temperatureHistory.values, maxValue: 105, color: module.tint)
+            if monitor.sensors.headline != nil {
+                Sparkline(values: monitor.temperatureHistory.values, maxValue: 105, color: module.tint)
+            } else {
+                Sparkline(values: monitor.powerHistory.values, color: .yellow)
+            }
         case .battery:
             if let b = monitor.battery {
                 VStack { Spacer(minLength: 0); MeterBar(value: b.percent, color: Theme.battery(b.percent, charging: b.isCharging), height: 7) }
             }
+        }
+    }
+}
+
+/// Einmalige Frage in der Store-Version, ob Puls mit dem Mac starten soll.
+struct LoginItemPrompt: View {
+    @Environment(Preferences.self) private var prefs
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: "power.circle.fill")
+                    .font(.system(size: 22))
+                    .foregroundStyle(.green.gradient)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Mit dem Mac starten?").font(.callout.weight(.semibold))
+                    Text("Puls öffnet sich dann nach jeder Anmeldung automatisch in der Menüleiste.")
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            HStack {
+                Spacer()
+                Button("Nein danke") { answer(false) }
+                    .buttonStyle(.glass)
+                Button("Automatisch starten") { answer(true) }
+                    .buttonStyle(.glassProminent)
+            }
+            .controlSize(.small)
+        }
+        .padding(12)
+        .card()
+    }
+
+    private func answer(_ enable: Bool) {
+        withAnimation(.snappy) {
+            prefs.launchAtLogin = enable
+            prefs.loginItemQuestionAnswered = true
         }
     }
 }

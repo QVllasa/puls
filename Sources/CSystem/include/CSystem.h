@@ -5,6 +5,8 @@
 #include <IOKit/IOKitLib.h>
 #include <stdint.h>
 
+CF_ASSUME_NONNULL_BEGIN
+
 // MARK: - SMC (System Management Controller)
 
 /// Öffnet eine Verbindung zum AppleSMC-Treiber. Gibt 0 bei Erfolg zurück.
@@ -20,5 +22,7 @@ int smc_read_key(io_connect_t conn, const char *key, uint32_t *type, uint8_t *by
 /// Liefert ein Dictionary Sensorname -> Temperatur in °C (CFNumber, double).
 /// Nutzt die IOHIDEventSystem-Schnittstelle, die auch Activity Monitor & Co. verwenden.
 CFDictionaryRef _Nullable hid_copy_temperatures(void) CF_RETURNS_RETAINED;
+
+CF_ASSUME_NONNULL_END
 
 #endif

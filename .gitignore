@@ -2,3 +2,9 @@
 *.app
 .DS_Store
 dist/
+dist-store/
+.build-store/
+.build-shots/
+appstore/*.provisionprofile
+appstore/*.p8
+appstore/*.p12

@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if CommandLine.arguments.contains("--open") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { self.controller.openPanel() }
         }
+        #if !APPSTORE
         // Diagnose: `--capture <datei.png>` öffnet das Panel und fotografiert es an seiner echten Position.
         if let i = CommandLine.arguments.firstIndex(of: "--capture"), i + 1 < CommandLine.arguments.count {
             let path = CommandLine.arguments[i + 1]
@@ -24,6 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+        #endif
     }
 
     /// Beim allerersten Start trägt sich Puls als Anmeldeobjekt ein, damit es mit dem Mac startet.
@@ -33,6 +35,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard Bundle.main.bundleURL.pathExtension == "app",
               !UserDefaults.standard.bool(forKey: key) else { return }
         UserDefaults.standard.set(true, forKey: key)
-        Preferences.shared.launchAtLogin = true
+        if Flavor.isAppStore {
+            // Store: nicht ungefragt eintragen, sondern beim ersten Start das Panel mit der Frage zeigen.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.controller.openPanel() }
+        } else {
+            Preferences.shared.launchAtLogin = true
+        }
     }
 }

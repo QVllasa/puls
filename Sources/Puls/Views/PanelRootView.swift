@@ -58,7 +58,7 @@ struct PanelHeader: View {
             case .overview:
                 AppGlyph()
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(monitor.machine.computerName)
+                    Text(monitor.displayComputerName)
                         .font(.headline)
                         .lineLimit(1)
                     Text("\(monitor.machine.chip) · \(Fmt.memory(monitor.machine.physicalMemory)) · seit \(Fmt.uptime(monitor.uptime))")

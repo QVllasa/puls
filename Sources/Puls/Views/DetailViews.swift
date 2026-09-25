@@ -59,8 +59,10 @@ struct CPUDetail: View {
             }
             InfoRow(label: "Eingeschaltet seit", value: Fmt.uptime(monitor.uptime))
         }
-        SectionCard(title: "Prozesse", trailing: "nach CPU") {
-            ProcessList(rows: monitor.topCPU, mode: .cpu)
+        if Flavor.hasProcesses {
+            SectionCard(title: "Prozesse", trailing: "nach CPU") {
+                ProcessList(rows: monitor.topCPU, mode: .cpu)
+            }
         }
     }
 
@@ -141,8 +143,10 @@ struct MemoryDetail: View {
             InfoRow(label: "Auslastung des Speichers", value: Fmt.percent(m.pressurePercent))
             InfoRow(label: "Auslagerung (Swap)", value: m.swapUsed > 0 ? "\(Fmt.memory(m.swapUsed)) von \(Fmt.memory(m.swapTotal))" : "Keine")
         }
-        SectionCard(title: "Prozesse", trailing: "nach Speicher") {
-            ProcessList(rows: monitor.topMemory, mode: .memory)
+        if Flavor.hasProcesses {
+            SectionCard(title: "Prozesse", trailing: "nach Speicher") {
+                ProcessList(rows: monitor.topMemory, mode: .memory)
+            }
         }
     }
 
@@ -247,6 +251,23 @@ struct SensorsDetail: View {
 
     var body: some View {
         let s = monitor.sensors
+        if s.cpu == nil {
+            SectionCard {
+                HStack(alignment: .top) {
+                    BigValue(value: s.thermalLabel, caption: "Thermischer Zustand",
+                             color: Theme.temperature(40 + s.thermalLevel * 0.55))
+                    Spacer()
+                    Image(systemName: "thermometer.medium")
+                        .font(.system(size: 26, weight: .semibold))
+                        .foregroundStyle(Theme.temperature(40 + s.thermalLevel * 0.55).gradient)
+                }
+                MeterBar(value: s.thermalLevel, color: Theme.temperature(40 + s.thermalLevel * 0.55), height: 8)
+                Text(thermalExplanation(s.thermalState))
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let t = s.battery { InfoRow(label: "Akku-Temperatur", value: temp(t)) }
+            }
+        } else {
         SectionCard {
             HStack(alignment: .top) {
                 BigValue(value: s.cpu.map { temp($0) } ?? "–", caption: "CPU-Temperatur (Ø)",
@@ -265,6 +286,8 @@ struct SensorsDetail: View {
                 if let t = s.battery { LegendValue(label: "Akku", value: temp(t), color: .green) }
                 if let t = s.ssd { LegendValue(label: "SSD", value: temp(t), color: .indigo) }
             }
+            InfoRow(label: "Thermischer Zustand", value: s.thermalLabel)
+        }
         }
         if !s.fans.isEmpty {
             SectionCard(title: "Lüfter") {
@@ -321,6 +344,16 @@ struct SensorsDetail: View {
     }
 
     private func temp(_ c: Double) -> String { Fmt.temperature(c, fahrenheit: prefs.useFahrenheit) }
+
+    private func thermalExplanation(_ state: ProcessInfo.ThermalState) -> String {
+        switch state {
+        case .nominal: "Der Mac arbeitet im normalen Temperaturbereich."
+        case .fair: "Der Mac wird wärmer. Die Lüfter können anlaufen."
+        case .serious: "Der Mac ist heiß und drosselt womöglich die Leistung."
+        case .critical: "Der Mac ist sehr heiß und drosselt die Leistung deutlich."
+        @unknown default: ""
+        }
+    }
 }
 
 // MARK: - Batterie

@@ -7,6 +7,11 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable {
 
     var id: String { rawValue }
 
+    /// In der Store-Version gibt es keine Chip-Temperaturen, daher auch keine Temperatur in der Menüleiste.
+    static var available: [MenuBarMetric] {
+        allCases.filter { !(Flavor.isAppStore && $0 == .temperature) }
+    }
+
     var title: String {
         switch self {
         case .cpu: "CPU"
@@ -38,6 +43,10 @@ final class Preferences {
     var fetchPublicIP: Bool {
         didSet { defaults.set(fetchPublicIP, forKey: "fetchPublicIP") }
     }
+    /// Store-Version: Der Nutzer hat die Autostart-Frage beantwortet (Regel 2.4.5: nur mit Zustimmung).
+    var loginItemQuestionAnswered: Bool {
+        didSet { defaults.set(loginItemQuestionAnswered, forKey: "loginItemQuestionAnswered") }
+    }
     var coloredMenuBar: Bool {
         didSet { defaults.set(coloredMenuBar, forKey: "coloredMenuBar") }
     }
@@ -66,15 +75,16 @@ final class Preferences {
             "menuBarMetrics": [MenuBarMetric.cpu, .memory, .network].map(\.rawValue),
             "refreshInterval": 2.0,
             "useFahrenheit": false,
-            "fetchPublicIP": true,
+            "fetchPublicIP": !Flavor.isAppStore, // Store: Fremddienst nur nach eigener Wahl
             "coloredMenuBar": true,
         ])
         let raw = defaults.stringArray(forKey: "menuBarMetrics") ?? []
-        menuBarMetrics = raw.compactMap(MenuBarMetric.init(rawValue:))
+        menuBarMetrics = raw.compactMap(MenuBarMetric.init(rawValue:)).filter(MenuBarMetric.available.contains)
         refreshInterval = defaults.double(forKey: "refreshInterval")
         useFahrenheit = defaults.bool(forKey: "useFahrenheit")
         fetchPublicIP = defaults.bool(forKey: "fetchPublicIP")
         coloredMenuBar = defaults.bool(forKey: "coloredMenuBar")
+        loginItemQuestionAnswered = defaults.bool(forKey: "loginItemQuestionAnswered")
         launchAtLogin = Self.loginItemIsOn
     }
 
@@ -90,6 +100,6 @@ final class Preferences {
         var set = Set(menuBarMetrics)
         if shown { set.insert(metric) } else { set.remove(metric) }
         // Reihenfolge immer wie in der Einstellungsliste
-        menuBarMetrics = MenuBarMetric.allCases.filter(set.contains)
+        menuBarMetrics = MenuBarMetric.available.filter(set.contains)
     }
 }

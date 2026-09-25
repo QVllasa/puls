@@ -27,10 +27,32 @@ struct SensorStats: Equatable {
     var ssd: Double?
     var fans: [FanInfo] = []
     var systemPower: Double?  // Watt, gesamtes System
+    var thermalState: ProcessInfo.ThermalState = .nominal
     var all: [SensorReading] = []
 
-    /// Wichtigster Temperaturwert für Kacheln und Menüleiste.
-    var headline: Double? { cpu ?? gpu ?? battery }
+    /// Wichtigster Temperaturwert für Kacheln und Menüleiste (nur echte Chip-Temperaturen).
+    var headline: Double? { cpu ?? gpu }
+
+    var thermalLabel: String {
+        switch thermalState {
+        case .nominal: "Normal"
+        case .fair: "Leicht erhöht"
+        case .serious: "Hoch"
+        case .critical: "Kritisch"
+        @unknown default: "Unbekannt"
+        }
+    }
+
+    /// 0 … 100 für Balken
+    var thermalLevel: Double {
+        switch thermalState {
+        case .nominal: 15
+        case .fair: 45
+        case .serious: 75
+        case .critical: 100
+        @unknown default: 0
+        }
+    }
 }
 
 final class SensorSampler {
@@ -67,6 +89,14 @@ final class SensorSampler {
         }
         stats.fans = readFans()
         if let power = readSMC("PSTR"), power > 0, power < 1000 { stats.systemPower = power }
+
+        // Ohne SMC (Store-Version, Sandbox): Werte aus dem Akku-Treiber.
+        if stats.systemPower == nil || stats.battery == nil {
+            let battery = BatterySampler.registry()
+            if stats.systemPower == nil { stats.systemPower = BatterySampler.systemLoadWatts(battery) }
+            if stats.battery == nil, let t = battery?["Temperature"] as? Int, t > 0 { stats.battery = Double(t) / 100 }
+        }
+        stats.thermalState = ProcessInfo.processInfo.thermalState
         return stats
     }
 
