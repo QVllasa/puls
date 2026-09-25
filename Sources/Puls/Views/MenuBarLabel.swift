@@ -35,11 +35,15 @@ struct MenuBarMetricIcon: View {
     }
 }
 
-/// Inhalt des Menüleisten-Symbols. Wird als Vorlagenbild gerendert, damit es sich
-/// automatisch an helle und dunkle Menüleisten anpasst.
+/// Inhalt des Menüleisten-Symbols. Einfarbig wird es als Vorlagenbild gerendert (macOS färbt es passend
+/// zur Menüleiste), farbig mit Ampel-Indikatoren und Textfarbe passend zur hellen bzw. dunklen Menüleiste.
 struct MenuBarLabel: View {
     let monitor: SystemMonitor
     let prefs: Preferences
+    var darkMenuBar = false
+
+    private var colored: Bool { prefs.coloredMenuBar }
+    private var ink: Color { colored && darkMenuBar ? .white : .black }
 
     var body: some View {
         HStack(spacing: 9) {
@@ -52,54 +56,67 @@ struct MenuBarLabel: View {
         }
         .padding(.horizontal, 2)
         .frame(height: 22)
-        .foregroundStyle(.black)
+        .foregroundStyle(ink)
     }
 
     @ViewBuilder private func item(_ metric: MenuBarMetric) -> some View {
         switch metric {
         case .cpu:
-            gaugeItem(caption: "CPU", value: monitor.cpu.total, history: monitor.cpuHistory.values)
+            gaugeItem(caption: "CPU", text: Fmt.percent(monitor.cpu.total),
+                      fill: monitor.cpu.total, color: Self.loadColor(monitor.cpu.total))
         case .gpu:
-            gaugeItem(caption: "GPU", value: monitor.gpu?.utilization ?? 0, history: monitor.gpuHistory.values)
+            let value = monitor.gpu?.utilization ?? 0
+            gaugeItem(caption: "GPU", text: Fmt.percent(value), fill: value, color: Self.loadColor(value))
         case .memory:
-            gaugeItem(caption: "RAM", value: monitor.memory.usedPercent, history: nil)
+            gaugeItem(caption: "RAM", text: Fmt.percent(monitor.memory.usedPercent),
+                      fill: monitor.memory.usedPercent, color: Self.pressureColor(monitor.memory.pressure))
         case .network:
             VStack(alignment: .trailing, spacing: -1) {
                 HStack(spacing: 2) {
                     Text(Fmt.compactRate(monitor.network.upload))
                     Image(systemName: "arrow.up").font(.system(size: 7, weight: .black))
+                        .foregroundStyle(colored ? Theme.upload : ink)
                 }
                 HStack(spacing: 2) {
                     Text(Fmt.compactRate(monitor.network.download))
                     Image(systemName: "arrow.down").font(.system(size: 7, weight: .black))
+                        .foregroundStyle(colored ? Theme.download : ink)
                 }
             }
             .font(.system(size: 9, weight: .semibold).monospacedDigit())
             .frame(width: 62, alignment: .trailing)
         case .disk:
-            twoLine(caption: "SSD", value: monitor.volumes.first.map { Fmt.storage($0.available) } ?? "–", width: 42)
+            let volume = monitor.volumes.first
+            gaugeItem(caption: "SSD", text: volume.map { Fmt.storage($0.available) } ?? "–",
+                      fill: volume?.usedPercent ?? 0, color: Self.loadColor(volume?.usedPercent ?? 0), width: 42)
         case .temperature:
-            twoLine(caption: "TEMP",
-                    value: monitor.sensors.headline.map { Fmt.temperature($0, fahrenheit: prefs.useFahrenheit) } ?? "–",
-                    width: 30)
+            let t = monitor.sensors.headline
+            gaugeItem(caption: "TEMP",
+                      text: t.map { Fmt.temperature($0, fahrenheit: prefs.useFahrenheit) } ?? "–",
+                      fill: t.map { ($0 - 25) / 75 * 100 } ?? 0,
+                      color: t.map(Theme.temperature) ?? .green, width: 30)
         case .battery:
+            let b = monitor.battery
             HStack(spacing: 3) {
-                Image(systemName: monitor.battery?.symbolName ?? "battery.100percent")
+                Image(systemName: b?.symbolName ?? "battery.100percent")
                     .font(.system(size: 13, weight: .regular))
-                Text(Fmt.percent(monitor.battery?.percent ?? 0))
+                    .symbolRenderingMode(colored ? .palette : .monochrome)
+                    .foregroundStyle(colored ? Theme.battery(b?.percent ?? 100, charging: b?.isCharging ?? false) : ink, ink.opacity(0.5))
+                Text(Fmt.percent(b?.percent ?? 0))
                     .font(.system(size: 11, weight: .semibold).monospacedDigit())
             }
         }
     }
 
-    /// Kleine Beschriftung + Wert, daneben ein Mini-Balken (iStat-Stil, aber reduziert).
-    private func gaugeItem(caption: String, value: Double, history: [Double]?) -> some View {
+    /// Beschriftung + Wert, daneben ein kleiner Füllbalken als Ampel-Indikator.
+    private func gaugeItem(caption: String, text: String, fill: Double, color: Color, width: CGFloat = 29) -> some View {
         HStack(spacing: 4) {
-            twoLine(caption: caption, value: Fmt.percent(value), width: 29)
+            twoLine(caption: caption, value: text, width: width)
             ZStack(alignment: .bottom) {
-                RoundedRectangle(cornerRadius: 1.5).fill(.black.opacity(0.25))
+                RoundedRectangle(cornerRadius: 1.5).fill(ink.opacity(0.22))
                 RoundedRectangle(cornerRadius: 1.5)
-                    .frame(height: max(1.5, 16 * min(value, 100) / 100))
+                    .fill(colored ? AnyShapeStyle(color) : AnyShapeStyle(ink))
+                    .frame(height: max(2, 16 * min(max(fill, 0), 100) / 100))
             }
             .frame(width: 4, height: 16)
         }
@@ -111,5 +128,21 @@ struct MenuBarLabel: View {
             Text(value).font(.system(size: 11, weight: .semibold).monospacedDigit())
         }
         .frame(width: width, alignment: .leading)
+    }
+
+    static func loadColor(_ percent: Double) -> Color {
+        switch percent {
+        case ..<60: Color(red: 0.20, green: 0.80, blue: 0.35)
+        case ..<85: Color(red: 1.00, green: 0.78, blue: 0.10)
+        default: Color(red: 1.00, green: 0.27, blue: 0.23)
+        }
+    }
+
+    static func pressureColor(_ pressure: MemoryPressure) -> Color {
+        switch pressure {
+        case .normal: loadColor(0)
+        case .warning: loadColor(70)
+        case .critical: loadColor(100)
+        }
     }
 }

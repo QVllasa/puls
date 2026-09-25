@@ -11,6 +11,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var outsideClickMonitor: Any?
     private var keyMonitor: Any?
     private var lastLabelKey = ""
+    private var appearanceObservation: NSKeyValueObservation?
 
     init(monitor: SystemMonitor, prefs: Preferences) {
         self.monitor = monitor
@@ -28,14 +29,17 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         monitor.onUpdate = { [weak self] in self?.updateLabel() }
         updateLabel()
 
-        withObservationTracking { _ = prefs.menuBarMetrics; _ = prefs.useFahrenheit } onChange: { [weak self] in
-            Task { @MainActor in self?.observePrefs() }
+        appearanceObservation = statusItem.button?.observe(\.effectiveAppearance) { [weak self] _, _ in
+            Task { @MainActor in self?.updateLabel() }
         }
+        observePrefs()
     }
 
     private func observePrefs() {
         updateLabel()
-        withObservationTracking { _ = prefs.menuBarMetrics; _ = prefs.useFahrenheit } onChange: { [weak self] in
+        withObservationTracking {
+            _ = prefs.menuBarMetrics; _ = prefs.useFahrenheit; _ = prefs.coloredMenuBar
+        } onChange: { [weak self] in
             Task { @MainActor in self?.observePrefs() }
         }
     }
@@ -44,10 +48,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     func updateLabel() {
         guard let button = statusItem.button else { return }
-        let renderer = ImageRenderer(content: MenuBarLabel(monitor: monitor, prefs: prefs))
+        let dark = button.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let renderer = ImageRenderer(content: MenuBarLabel(monitor: monitor, prefs: prefs, darkMenuBar: dark))
         renderer.scale = button.window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
         guard let image = renderer.nsImage else { return }
-        image.isTemplate = true
+        image.isTemplate = !prefs.coloredMenuBar
         button.image = image
         let summary = prefs.menuBarMetrics.map(\.title).joined(separator: ", ")
         if summary != lastLabelKey {

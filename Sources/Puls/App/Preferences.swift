@@ -38,6 +38,9 @@ final class Preferences {
     var fetchPublicIP: Bool {
         didSet { defaults.set(fetchPublicIP, forKey: "fetchPublicIP") }
     }
+    var coloredMenuBar: Bool {
+        didSet { defaults.set(coloredMenuBar, forKey: "coloredMenuBar") }
+    }
     var launchAtLogin: Bool {
         didSet {
             guard !syncingLoginItem, launchAtLogin != oldValue else { return }
@@ -61,12 +64,14 @@ final class Preferences {
             "refreshInterval": 2.0,
             "useFahrenheit": false,
             "fetchPublicIP": true,
+            "coloredMenuBar": true,
         ])
         let raw = defaults.stringArray(forKey: "menuBarMetrics") ?? []
         menuBarMetrics = raw.compactMap(MenuBarMetric.init(rawValue:))
         refreshInterval = defaults.double(forKey: "refreshInterval")
         useFahrenheit = defaults.bool(forKey: "useFahrenheit")
         fetchPublicIP = defaults.bool(forKey: "fetchPublicIP")
+        coloredMenuBar = defaults.bool(forKey: "coloredMenuBar")
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 

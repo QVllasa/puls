@@ -19,6 +19,9 @@ struct SettingsView: View {
                     }
                     .font(.callout)
                 }
+                Divider().opacity(0.5)
+                SwitchRow(title: "Farbige Indikatoren", isOn: $prefs.coloredMenuBar)
+                    .font(.callout)
             }
             SectionCard(title: "Allgemein") {
                 HStack {
