@@ -1,121 +1,130 @@
 <p align="center">
-  <img src="Resources/AppIcon-1024.png" width="128" height="128" alt="Puls-Icon">
+  <img src="Resources/AppIcon-1024.png" width="128" height="128" alt="Puls icon">
 </p>
 
 <h1 align="center">Puls</h1>
 
 <p align="center">
-  Ein schlanker Systemmonitor für die macOS-Menüleiste – im Liquid-Glass-Design von macOS 26.<br>
-  Inspiriert von iStat Menus, aber bewusst einfacher: ein Symbol, ein Panel, alles Wichtige auf einen Blick.
+  A lightweight system monitor for the macOS menu bar – in the Liquid Glass design of macOS 26.<br>
+  Inspired by iStat Menus, but deliberately simpler: one menu bar item, one panel, everything important at a glance.
 </p>
 
 <p align="center">
-  <a href="https://github.com/QVllasa/puls/releases/latest"><b>⬇︎ Puls herunterladen</b></a> ·
-  macOS 26 Tahoe · Apple Silicon &amp; Intel · kostenlos &amp; Open Source (MIT)
+  <a href="https://github.com/QVllasa/puls/releases/latest"><b>⬇︎ Download Puls</b></a> ·
+  <a href="https://qvllasa.github.io/puls/">Website</a> ·
+  macOS 26 Tahoe · Apple silicon &amp; Intel · English &amp; German · free &amp; open source (MIT)
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/overview-dark.png" width="400" alt="Übersicht (dunkel)">
-  <img src="docs/screenshots/overview-light.png" width="400" alt="Übersicht (hell)">
+  <a href="https://github.com/QVllasa/puls/actions/workflows/ci.yml"><img src="https://github.com/QVllasa/puls/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  · <a href="README.de.md">Deutsch</a>
 </p>
 
-## Was Puls kann
+<p align="center">
+  <img src="docs/screenshots/en/overview-dark.png" width="400" alt="Overview (dark)">
+  <img src="docs/screenshots/en/overview-light.png" width="400" alt="Overview (light)">
+</p>
 
-| Bereich | In der Übersicht | In der Detailansicht |
+## What Puls shows
+
+| Area | In the overview | In the details |
 |---|---|---|
-| **CPU** | Auslastung, Verlauf | Nutzer/System/Leerlauf, jeder Kern einzeln (nach Kerntyp gruppiert), Systemlast 1/5/15 Min, Laufzeit, Top-Prozesse |
-| **Grafik** | GPU-Auslastung, Verlauf | Renderer-Last, belegter Grafikspeicher, GPU-Kerne, GPU-Temperatur |
-| **Speicher** | Belegung, Verlauf | App-Speicher, fester Speicher, komprimiert, Cache, Speicherdruck, Swap, Top-Prozesse |
-| **Netzwerk** | Download/Upload live | Gespiegelter Verlauf, Spitzenwerte, WLAN/Ethernet, lokale und öffentliche IP (Klick kopiert), Datenmenge seit Start |
-| **Festplatte** | Freier Speicher | Lesen/Schreiben live, alle Volumes mit Belegung (Klick öffnet im Finder) |
-| **Sensoren** | CPU-Temperatur, Lüfter, Watt | Ø- und Höchsttemperatur, Grafik/Akku/SSD, Lüfterdrehzahlen, Leistungsaufnahme des Systems, alle Fühler |
-| **Batterie** | Ladestand, Restlaufzeit | Zustand (max. Kapazität), Ladezyklen, Temperatur, Lade-/Entladeleistung, Netzteil, Akkus von AirPods, Magic Keyboard, Maus & Co. |
+| **CPU** | Load, history | User/system/idle, every core grouped by core type, system load 1/5/15 min, uptime, top processes |
+| **Graphics** | GPU utilization, history | Renderer load, graphics memory, GPU cores, GPU temperature |
+| **Memory** | Usage, history | App, wired and compressed memory, cache, memory pressure, swap, top processes |
+| **Network** | Live download/upload | Mirrored history, peaks, Wi-Fi/Ethernet, local and public IP (click to copy), data since startup |
+| **Disk** | Free space | Live read/write, all volumes with usage (click to open in Finder) |
+| **Sensors** | CPU temperature, fans, watts | Average and hottest core, graphics/battery/SSD, fan speeds, system power draw, all sensors |
+| **Battery** | Charge, time remaining | Maximum capacity, cycle count, temperature, charging/discharging power, adapter, AirPods / Magic accessories |
 
-**Menüleiste:** Frei wählbar, was oben angezeigt wird (CPU, Grafik, Speicher, Netzwerk, Festplatte, Temperatur, Batterie) – mit farbigen Ampel-Indikatoren, die bei hoher Last gelb bzw. rot werden, oder schlicht einfarbig.
+**Menu bar:** choose what appears at the top (CPU, graphics, memory, network, disk, temperature, battery) – with colored status indicators that turn yellow or red under load, or plain monochrome.
 
 <p align="center">
-  <img src="docs/screenshots/menubar-dark.png" height="36" alt="Menüleiste dunkel"><br>
-  <img src="docs/screenshots/menubar-light.png" height="36" alt="Menüleiste hell">
+  <img src="docs/screenshots/en/menubar-dark.png" height="36" alt="Menu bar (dark)"><br>
+  <img src="docs/screenshots/en/menubar-light.png" height="36" alt="Menu bar (light)">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/cpu.png" width="260" alt="CPU">
-  <img src="docs/screenshots/network.png" width="260" alt="Netzwerk">
-  <img src="docs/screenshots/sensors.png" width="260" alt="Sensoren">
+  <img src="docs/screenshots/en/cpu.png" width="260" alt="CPU">
+  <img src="docs/screenshots/en/network.png" width="260" alt="Network">
+  <img src="docs/screenshots/en/sensors.png" width="260" alt="Sensors">
 </p>
 <p align="center">
-  <img src="docs/screenshots/memory.png" width="260" alt="Speicher">
-  <img src="docs/screenshots/battery.png" width="260" alt="Batterie">
-  <img src="docs/screenshots/settings.png" width="260" alt="Einstellungen">
+  <img src="docs/screenshots/en/memory.png" width="260" alt="Memory">
+  <img src="docs/screenshots/en/battery.png" width="260" alt="Battery">
+  <img src="docs/screenshots/en/settings.png" width="260" alt="Settings">
 </p>
 
-## Bedienung
+## GitHub version or Mac App Store?
 
-- **Klick** auf das Menüleisten-Symbol öffnet das Glas-Panel, ein Klick auf eine Kachel die Details.
-- **Rechtsklick** öffnet ein kleines Menü (Einstellungen, Aktivitätsanzeige, Beenden).
-- **Esc** oder ein Klick daneben schließt das Panel.
-- Puls startet beim ersten Öffnen automatisch mit dem Mac (in den Einstellungen abschaltbar).
+| | GitHub (this repo) | Mac App Store |
+|---|---|---|
+| Price | free | free |
+| CPU / GPU / memory / network / disk / battery | ✓ | ✓ |
+| CPU & chip temperatures, fan speeds | ✓ | – (not allowed in the App Sandbox) |
+| Top processes | ✓ | – (not allowed in the App Sandbox) |
+| AirPods battery levels | ✓ | – |
+| Thermal state, power draw, battery temperature | ✓ | ✓ |
+| Updates | in-app notice, download from GitHub | automatic via the App Store |
+| Code signing | Developer ID, notarized by Apple | App Store |
+
+Please install only one of them – both are called “Puls”.
+
+## Usage
+
+- **Click** the menu bar item to open the glass panel; click a tile for details.
+- **Right-click** for a small menu (settings, Activity Monitor, quit).
+- **Esc** or a click elsewhere closes the panel.
+- The GitHub version starts with your Mac from the first launch; the App Store version asks first. Both can be changed in Settings.
 
 ## Installation
 
-1. [`Puls-x.y.z.zip` aus dem neuesten Release](https://github.com/QVllasa/puls/releases/latest) laden, entpacken und `Puls.app` in den Ordner **Programme** ziehen.
-2. Puls ist frei verteilt und nicht bei Apple notariell beglaubigt. Beim ersten Start meldet macOS deshalb, dass die App nicht überprüft werden konnte. So öffnest du sie trotzdem:
-   - **Systemeinstellungen → Datenschutz & Sicherheit →** ganz unten bei „Puls wurde blockiert“ auf **Trotzdem öffnen** klicken, **oder**
-   - im Terminal: `xattr -dr com.apple.quarantine /Applications/Puls.app`
-3. Puls erscheint oben rechts in der Menüleiste. Fertig.
+1. Download `Puls-x.y.z.zip` from the [latest release](https://github.com/QVllasa/puls/releases/latest), unzip it and drag `Puls.app` into **Applications**.
+2. Open it. Puls appears in the top-right of the menu bar.
 
-Voraussetzung ist **macOS 26 (Tahoe)** oder neuer, weil Puls das neue Liquid-Glass-Material nutzt.
+Requires **macOS 26 (Tahoe)** or later.
 
-## Datenschutz
+## Privacy
 
-Puls sammelt nichts und sendet nichts. Die einzige Netzwerkanfrage ist das Abrufen der eigenen öffentlichen IP-Adresse über [api.ipify.org](https://www.ipify.org) – höchstens alle 5 Minuten, nur solange das Panel offen ist, und in den Einstellungen abschaltbar.
+Puls collects nothing. All values are read locally. The only network requests: once a day the GitHub version asks api.github.com for a newer release (can be turned off), and – only if you enable it – Puls looks up your public IP via [api.ipify.org](https://www.ipify.org). Full policy: [privacy](https://qvllasa.github.io/puls/privacy.html).
 
-## Selbst bauen
+## Build it yourself
 
-Es reichen die Command Line Tools (`xcode-select --install`), Xcode ist nicht nötig.
+The Command Line Tools are enough (`xcode-select --install`); Xcode is only needed to recompile the app icon.
 
 ```sh
 git clone https://github.com/QVllasa/puls.git && cd puls
-swift build                      # Entwicklungs-Build
-.build/debug/Puls --dump         # alle Messwerte als Text ausgeben (Diagnose)
-scripts/build-app.sh             # Universal-App nach dist/Puls.app + ZIP
+swift build                      # development build
+scripts/test.sh                  # unit tests (also works without Xcode)
+.build/debug/Puls --dump         # print all readings (diagnostics)
+scripts/build-app.sh             # universal app in dist/Puls.app + ZIP
 ```
 
-`--snapshot <ordner> [--light] [--warmup <sek>]` erzeugt die Screenshots dieser Seite.
+Every push is built and tested on Apple silicon and Intel by [GitHub Actions](.github/workflows/ci.yml).
 
-## Wie es funktioniert
+| Script | Purpose |
+|---|---|
+| `scripts/build-app.sh` | GitHub version: universal app, signed and notarized (if a Developer ID is available), ZIP |
+| `scripts/build-appstore.sh` | App Store version (`-DAPPSTORE`): sandboxed, no private APIs, signed `.pkg` |
+| `scripts/asc_submit.py` | App Store Connect: metadata, screenshots, upload, submission via the official API |
+| `scripts/compile-icon.sh` | Compiles the Liquid Glass icon (`Resources/AppIcon.icon`) with `actool` |
+| `scripts/gen-strings.py` | Generates the English/German string tables from `Resources/l10n/de.json` |
 
-Puls liest alle Werte direkt aus macOS, ohne Hilfsprogramme und ohne Administratorrechte:
+## How it works
 
-- **CPU** über `host_processor_info`, Kerntypen über `hw.perflevel*`
-- **Speicher** über `host_statistics64` (gleiche Formel wie die Aktivitätsanzeige), Speicherdruck über `kern.memorystatus_*`
-- **GPU** über die `PerformanceStatistics` des IOAccelerator-Treibers
-- **Netzwerk** über 64-Bit-Zähler (`NET_RT_IFLIST2`) der primären Schnittstelle
-- **Festplatte** über die Statistiken von `IOBlockStorageDriver`
-- **Temperaturen** über das IOHIDEventSystem (Apple Silicon), **Lüfter & Leistung** über den SMC
-- **Batterie** über IOPowerSources und `AppleSmartBattery`, **Bluetooth-Akkus** über `system_profiler` und IOKit
-- **Prozesse** über `ps`
+Puls reads everything directly from macOS, without helper tools or administrator rights:
 
-Getestet auf MacBook Pro mit M2 Pro und M5 Pro. Auf Intel-Macs laufen alle Module, die Temperaturfühler sind dort aber eingeschränkt.
+- **CPU** via `host_processor_info`, core types via `hw.perflevel*`
+- **Memory** via `host_statistics64` (same formula as Activity Monitor), memory pressure via `kern.memorystatus_*`
+- **GPU** via the IOAccelerator `PerformanceStatistics`
+- **Network** via 64-bit counters (`NET_RT_IFLIST2`) of the primary interface
+- **Disk** via `IOBlockStorageDriver` statistics
+- **Temperatures** via IOHIDEventSystem (Apple silicon), **fans & power** via the SMC (GitHub version only)
+- **Battery** via IOPowerSources and `AppleSmartBattery`, system power via its power telemetry
+- **Bluetooth batteries** via `system_profiler` and IOKit; **processes** via `ps`
 
-## Im Vergleich zu iStat Menus
+Tested on MacBook Pro M2 Pro and M5 Pro, and on Intel in CI.
 
-Puls konzentriert sich auf die Systemwerte und lässt bewusst weg: Wetter, Uhrzeit/Weltzeit, Benachrichtigungen, mehrere Menüleisten-Symbole pro Modul und Dutzende Darstellungsoptionen. Dafür ist alles in einem einzigen, ruhigen Panel.
+## License
 
-## Lizenz
-
-[MIT](LICENSE) – du darfst Puls frei benutzen, verändern und weitergeben.
-
----
-
-<details>
-<summary><b>English</b></summary>
-
-**Puls** is a lightweight system monitor for the macOS menu bar with a Liquid Glass design (macOS 26+). Think iStat Menus, simplified: one menu bar item, one glass panel with tiles for CPU, GPU, memory, network, disk, sensors (temperatures, fans, power draw) and battery (incl. AirPods / Magic accessories). Tap a tile for details. Colored traffic-light indicators in the menu bar are optional. The UI is currently German.
-
-**Install:** download the ZIP from the [latest release](https://github.com/QVllasa/puls/releases/latest), move `Puls.app` to Applications. The app is not notarized, so allow it once via *System Settings → Privacy & Security → Open Anyway*, or run `xattr -dr com.apple.quarantine /Applications/Puls.app`.
-
-**Build:** `swift build` (Command Line Tools are enough), `scripts/build-app.sh` for a universal app bundle.
-
-No telemetry. The only network request fetches your public IP from api.ipify.org (can be disabled). MIT licensed.
-</details>
+[MIT](LICENSE) – you may use, modify and share Puls freely.

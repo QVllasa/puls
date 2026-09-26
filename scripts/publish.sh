@@ -31,6 +31,6 @@ if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
 else
     echo "▸ Erstelle Release $TAG …"
     gh release create "$TAG" "dist/Puls-$VERSION.zip" "dist/Puls-$VERSION.zip.sha256" \
-        --repo "$REPO" --title "Puls $VERSION" --notes-file docs/RELEASE_NOTES.md
+        --repo "$REPO" --title "Puls $VERSION" --notes-file "releases/$VERSION.md"
 fi
 echo "✓ https://github.com/$REPO"

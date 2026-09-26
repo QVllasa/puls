@@ -19,8 +19,9 @@ from asc import call
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 META = json.loads((ROOT / "appstore/metadata.json").read_text())
-LOC = "de-DE"
-M = META[LOC]
+LOCALES = ["en-US", "de-DE"]
+PRIMARY = META.get("primary_language", "en-US")
+M = META[PRIMARY]
 VERSION = (ROOT / "VERSION").read_text().strip()
 XCODE_HOST = os.environ.get("XCODE_HOST", "qendrimvllasa@100.117.69.64")
 REVIEW_CONTACT = {
@@ -73,7 +74,7 @@ def prepare():
     a = app(); app_id = a["id"]
     print("▸ App", app_id, a["attributes"]["name"])
 
-    # Inhalte Dritter: keine
+    # Inhalte Dritter: keine; Hauptsprache Englisch
     ok(*call("PATCH", f"/v1/apps/{app_id}", {"data": {"type": "apps", "id": app_id, "attributes": {
         "contentRightsDeclaration": "DOES_NOT_USE_THIRD_PARTY_CONTENT"}}}), "Inhaltsrechte")
 
@@ -85,16 +86,18 @@ def prepare():
     print("✓ Kategorien")
 
     locs = get(f"/v1/appInfos/{info_id}/appInfoLocalizations")["data"]
-    attrs = {"name": M["name"], "subtitle": M["subtitle"], "privacyPolicyUrl": META["privacy_url"]}
-    loc = next((l for l in locs if l["attributes"]["locale"] == LOC), None)
-    if loc:
-        ok(*call("PATCH", f"/v1/appInfoLocalizations/{loc['id']}", {"data": {"type": "appInfoLocalizations",
-            "id": loc["id"], "attributes": attrs}}), "App-Info-Texte")
-    else:
-        ok(*call("POST", "/v1/appInfoLocalizations", {"data": {"type": "appInfoLocalizations",
-            "attributes": {"locale": LOC, **attrs},
-            "relationships": {"appInfo": {"data": {"type": "appInfos", "id": info_id}}}}}), "App-Info-Texte")
-    print("✓ Name, Untertitel, Datenschutz-URL")
+    for LOC in LOCALES:
+        T = META[LOC]
+        attrs = {"name": T["name"], "subtitle": T["subtitle"], "privacyPolicyUrl": T["urls"]["privacy"]}
+        loc = next((l for l in locs if l["attributes"]["locale"] == LOC), None)
+        if loc:
+            ok(*call("PATCH", f"/v1/appInfoLocalizations/{loc['id']}", {"data": {"type": "appInfoLocalizations",
+                "id": loc["id"], "attributes": attrs}}), f"App-Info-Texte {LOC}")
+        else:
+            ok(*call("POST", "/v1/appInfoLocalizations", {"data": {"type": "appInfoLocalizations",
+                "attributes": {"locale": LOC, **attrs},
+                "relationships": {"appInfo": {"data": {"type": "appInfos", "id": info_id}}}}}), f"App-Info-Texte {LOC}")
+        print(f"✓ Name, Untertitel, Datenschutz-URL ({LOC})")
 
     # Altersfreigabe: alles „keine“ → 4+
     s, d = call("GET", f"/v1/appInfos/{info_id}/ageRatingDeclaration")
@@ -157,19 +160,25 @@ def prepare():
     print("✓ Version", VERSION)
 
     vlocs = get(f"/v1/appStoreVersions/{v_id}/appStoreVersionLocalizations")["data"]
-    vattrs = {"description": M["description"], "keywords": M["keywords"], "promotionalText": M["promotional_text"],
-              "supportUrl": META["support_url"], "marketingUrl": META["marketing_url"]}
-    vloc = next((l for l in vlocs if l["attributes"]["locale"] == LOC), None)
-    if vloc:
-        ok(*call("PATCH", f"/v1/appStoreVersionLocalizations/{vloc['id']}", {"data": {
-            "type": "appStoreVersionLocalizations", "id": vloc["id"], "attributes": vattrs}}), "Versionstexte")
-    else:
-        vloc = ok(*call("POST", "/v1/appStoreVersionLocalizations", {"data": {"type": "appStoreVersionLocalizations",
-            "attributes": {"locale": LOC, **vattrs},
-            "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": v_id}}}}}), "Versionstexte")["data"]
-    print("✓ Beschreibung, Suchbegriffe, Werbetext, Support- und Marketing-URL")
+    for LOC in LOCALES:
+        T = META[LOC]
+        vattrs = {"description": T["description"], "keywords": T["keywords"], "promotionalText": T["promotional_text"],
+                  "supportUrl": T["urls"]["support"], "marketingUrl": T["urls"]["marketing"]}
+        vloc = next((l for l in vlocs if l["attributes"]["locale"] == LOC), None)
+        if vloc:
+            ok(*call("PATCH", f"/v1/appStoreVersionLocalizations/{vloc['id']}", {"data": {
+                "type": "appStoreVersionLocalizations", "id": vloc["id"], "attributes": vattrs}}), f"Versionstexte {LOC}")
+        else:
+            vloc = ok(*call("POST", "/v1/appStoreVersionLocalizations", {"data": {"type": "appStoreVersionLocalizations",
+                "attributes": {"locale": LOC, **vattrs},
+                "relationships": {"appStoreVersion": {"data": {"type": "appStoreVersions", "id": v_id}}}}}), f"Versionstexte {LOC}")["data"]
+        print(f"✓ Beschreibung, Suchbegriffe, Werbetext, URLs ({LOC})")
+        upload_screenshots(vloc["id"], LOC[:2])
 
-    upload_screenshots(vloc["id"])
+    # Hauptsprache erst umstellen, wenn ihre Screenshots vorhanden sind
+    ok(*call("PATCH", f"/v1/apps/{app_id}", {"data": {"type": "apps", "id": app_id, "attributes": {
+        "primaryLocale": PRIMARY}}}), "Hauptsprache")
+    print("✓ Hauptsprache:", PRIMARY)
 
     # Prüfer-Informationen
     review = {**REVIEW_CONTACT, "demoAccountRequired": False, "notes": M["review_notes"]}
@@ -183,9 +192,9 @@ def prepare():
     print("✓ Prüfer-Kontakt und Hinweise")
 
 
-def upload_screenshots(vloc_id):
+def upload_screenshots(vloc_id, lang):
     import requests
-    files = sorted((ROOT / "appstore/screenshots").glob("*.png"))
+    files = sorted((ROOT / f"appstore/screenshots/{lang}").glob("*.png"))
     sets = get(f"/v1/appStoreVersionLocalizations/{vloc_id}/appScreenshotSets")["data"]
     desktop = next((x for x in sets if x["attributes"]["screenshotDisplayType"] == "APP_DESKTOP"), None)
     if desktop:

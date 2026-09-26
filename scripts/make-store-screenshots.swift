@@ -1,5 +1,5 @@
 // Erzeugt die Mac-App-Store-Screenshots (2880 × 1800) aus den Panel-Aufnahmen.
-// Aufruf: swift scripts/make-store-screenshots.swift <aufnahmen-ordner> <ziel-ordner>
+// Aufruf: swift scripts/make-store-screenshots.swift <aufnahmen-ordner> <ziel-ordner> [en|de]
 // Der Aufnahmen-Ordner enthält dark/ und light/ aus `Puls --snapshot`.
 import AppKit
 import SwiftUI
@@ -7,6 +7,7 @@ import SwiftUI
 let args = CommandLine.arguments
 let source = URL(fileURLWithPath: args[1])
 let target = URL(fileURLWithPath: args[2])
+let lang = args.count > 3 ? args[3] : "de"
 try? FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
 
 func image(_ path: String) -> NSImage {
@@ -84,26 +85,36 @@ struct Slide: View {
     }
 }
 
+struct Copy { let title: String; let subtitle: String }
+let texts: [String: [Copy]] = [
+    "de": [
+        Copy(title: "Dein Mac auf einen Blick.", subtitle: "CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku – live in der Menüleiste."),
+        Copy(title: "Jeder Kern. Jede Sekunde.", subtitle: "Gesamtauslastung, alle Kerne nach Typ und die Systemlast – mit Verlauf."),
+        Copy(title: "Speicher verstehen.", subtitle: "App-Speicher, Speicherdruck und Auslagerung übersichtlich erklärt."),
+        Copy(title: "Netzwerk live.", subtitle: "Download und Upload in Echtzeit, Spitzenwerte und übertragene Datenmenge."),
+        Copy(title: "Akku und Energie im Griff.", subtitle: "Zustand, Ladezyklen, Verbrauch und thermischer Zustand deines Mac."),
+        Copy(title: "Deine Menüleiste, deine Wahl.", subtitle: "Wähle die Werte für die Menüleiste – mit farbigen Ampel-Indikatoren. In Hell und Dunkel."),
+    ],
+    "en": [
+        Copy(title: "Your Mac at a glance.", subtitle: "CPU, graphics, memory, network, disk and battery – live in your menu bar."),
+        Copy(title: "Every core. Every second.", subtitle: "Total load, every core by type and system load – with history."),
+        Copy(title: "Understand your memory.", subtitle: "App memory, memory pressure and swap, clearly explained."),
+        Copy(title: "Network, live.", subtitle: "Download and upload in real time, peaks and data transferred."),
+        Copy(title: "Battery and energy under control.", subtitle: "Health, cycle count, power draw and your Mac’s thermal state."),
+        Copy(title: "Your menu bar, your choice.", subtitle: "Pick the values for your menu bar – with colored status indicators. Light and dark."),
+    ],
+]
+let t = texts[lang]!
 let slides: [(String, Slide)] = [
-    ("01-uebersicht", Slide(title: "Dein Mac auf einen Blick.",
-                            subtitle: "CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku – live in der Menüleiste.",
-                            panels: [image("dark/overview.png")], menubar: image("dark/menubar-dark.png"))),
-    ("02-cpu", Slide(title: "Jeder Kern. Jede Sekunde.",
-                     subtitle: "Gesamtauslastung, alle Kerne nach Typ und die Systemlast – mit Verlauf.",
-                     panels: [image("dark/cpu.png")])),
-    ("03-speicher", Slide(title: "Speicher verstehen.",
-                          subtitle: "App-Speicher, Speicherdruck und Auslagerung übersichtlich erklärt.",
-                          panels: [image("dark/memory.png")])),
-    ("04-netzwerk", Slide(title: "Netzwerk live.",
-                          subtitle: "Download und Upload in Echtzeit, Spitzenwerte und übertragene Datenmenge.",
-                          panels: [image("dark/network.png")])),
-    ("05-batterie", Slide(title: "Akku und Energie im Griff.",
-                          subtitle: "Zustand, Ladezyklen, Verbrauch und thermischer Zustand deines Mac.",
-                          panels: [image("dark/battery.png"), image("dark/sensors.png")])),
-    ("06-hell", Slide(title: "Deine Menüleiste, deine Wahl.",
-                      subtitle: "Wähle die Werte für die Menüleiste – mit farbigen Ampel-Indikatoren. In Hell und Dunkel.",
-                      panels: [image("light/overview.png"), image("light/network.png")], light: true,
-                      menubar: image("light/menubar-light.png"))),
+    ("01-overview", Slide(title: t[0].title, subtitle: t[0].subtitle,
+                          panels: [image("dark/overview.png")], menubar: image("dark/menubar-dark.png"))),
+    ("02-cpu", Slide(title: t[1].title, subtitle: t[1].subtitle, panels: [image("dark/cpu.png")])),
+    ("03-memory", Slide(title: t[2].title, subtitle: t[2].subtitle, panels: [image("dark/memory.png")])),
+    ("04-network", Slide(title: t[3].title, subtitle: t[3].subtitle, panels: [image("dark/network.png")])),
+    ("05-battery", Slide(title: t[4].title, subtitle: t[4].subtitle, panels: [image("dark/battery.png"), image("dark/sensors.png")])),
+    ("06-light", Slide(title: t[5].title, subtitle: t[5].subtitle,
+                       panels: [image("light/overview.png"), image("light/network.png")], light: true,
+                       menubar: image("light/menubar-light.png"))),
 ]
 
 MainActor.assumeIsolated {
