@@ -23,6 +23,19 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable {
         case .battery: String(localized: "Battery")
         }
     }
+
+    /// Detailansicht, die ein Klick auf diesen Wert in der Menüleiste öffnet.
+    var module: Module {
+        switch self {
+        case .cpu: .cpu
+        case .gpu: .gpu
+        case .memory: .memory
+        case .network: .network
+        case .disk: .disk
+        case .temperature: .sensors
+        case .battery: .battery
+        }
+    }
 }
 
 @Observable

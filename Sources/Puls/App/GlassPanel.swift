@@ -4,12 +4,16 @@ import SwiftUI
 /// Rahmenloses, schwebendes Panel mit echtem Liquid-Glass-Hintergrund (NSGlassEffectView).
 final class GlassPanel: NSPanel {
     init<Content: View>(rootView: Content) {
-        super.init(contentRect: NSRect(x: 0, y: 0, width: PanelMetrics.width, height: PanelMetrics.height),
+        let glassFrame = PanelMetrics.glassFrameInWindow
+        let windowRect = NSRect(origin: .zero, size: PanelMetrics.windowSize)
+        super.init(contentRect: windowRect,
                    styleMask: [.borderless, .nonactivatingPanel],
                    backing: .buffered, defer: true)
         isOpaque = false
         backgroundColor = .clear
-        hasShadow = true
+        // Den Schatten zeichnet das Glas selbst, rund und im durchsichtigen Rand. Ein Fensterschatten
+        // würde aus dem Rand ein Rechteck berechnen.
+        hasShadow = false
         level = .statusBar
         isMovable = false
         hidesOnDeactivate = false
@@ -25,7 +29,20 @@ final class GlassPanel: NSPanel {
         let host = NSHostingView(rootView: rootView)
         host.sizingOptions = []
         glass.contentView = host
-        contentView = glass
+        glass.frame = glassFrame
+        glass.autoresizingMask = [.width, .height]
+        let container = NSView(frame: windowRect)
+        container.addSubview(glass)
+        contentView = container
+        self.glass = glass
+    }
+
+    private weak var glass: NSView?
+
+    /// Liegt der Punkt (Fensterkoordinaten) im durchsichtigen Rand statt auf dem Glas?
+    func isInShadowMargin(_ point: NSPoint) -> Bool {
+        guard let glass else { return false }
+        return !glass.frame.contains(point)
     }
 
     override var canBecomeKey: Bool { true }

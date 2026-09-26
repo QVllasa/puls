@@ -10,29 +10,8 @@ struct MenuBarMetricIcon: View {
             .frame(width: 18)
     }
 
-    private var symbol: String {
-        switch metric {
-        case .cpu: Module.cpu.symbol
-        case .gpu: Module.gpu.symbol
-        case .memory: Module.memory.symbol
-        case .network: Module.network.symbol
-        case .disk: Module.disk.symbol
-        case .temperature: Module.sensors.symbol
-        case .battery: Module.battery.symbol
-        }
-    }
-
-    private var tint: Color {
-        switch metric {
-        case .cpu: Module.cpu.tint
-        case .gpu: Module.gpu.tint
-        case .memory: Module.memory.tint
-        case .network: Module.network.tint
-        case .disk: Module.disk.tint
-        case .temperature: Module.sensors.tint
-        case .battery: Module.battery.tint
-        }
-    }
+    private var symbol: String { metric.module.symbol }
+    private var tint: Color { metric.module.tint }
 }
 
 /// Inhalt des Menüleisten-Symbols. Einfarbig wird es als Vorlagenbild gerendert (macOS färbt es passend
@@ -41,20 +20,26 @@ struct MenuBarLabel: View {
     let monitor: SystemMonitor
     let prefs: Preferences
     var darkMenuBar = false
+    /// Nur diese Werte zeichnen statt der eingestellten (zum Ausmessen einzelner Werte).
+    var only: [MenuBarMetric]?
 
+    static let spacing: CGFloat = 9
+    static let padding: CGFloat = 2
+
+    private var metrics: [MenuBarMetric] { only ?? prefs.menuBarMetrics }
     private var colored: Bool { prefs.coloredMenuBar }
     private var ink: Color { colored && darkMenuBar ? .white : .black }
 
     var body: some View {
-        HStack(spacing: 9) {
-            if prefs.menuBarMetrics.isEmpty {
+        HStack(spacing: Self.spacing) {
+            if metrics.isEmpty {
                 Image(systemName: "waveform.path.ecg").font(.system(size: 14, weight: .semibold))
             }
-            ForEach(prefs.menuBarMetrics) { metric in
+            ForEach(metrics) { metric in
                 item(metric)
             }
         }
-        .padding(.horizontal, 2)
+        .padding(.horizontal, Self.padding)
         .frame(height: 22)
         .foregroundStyle(ink)
     }
@@ -130,10 +115,32 @@ struct MenuBarLabel: View {
         .frame(width: width, alignment: .leading)
     }
 
+    /// Breite jedes eingestellten Werts, einzeln gerendert, in der Reihenfolge der Menüleiste.
+    @MainActor func itemWidths() -> [CGFloat] {
+        metrics.map { metric in
+            var single = self
+            single.only = [metric]
+            return (ImageRenderer(content: single).nsImage?.size.width ?? 2 * Self.padding) - 2 * Self.padding
+        }
+    }
+
+    /// Welcher Wert liegt an Position x (Punkte ab linkem Bildrand)? Der Abstand zwischen zwei Werten
+    /// gehört je zur Hälfte zum linken und zum rechten Nachbarn.
+    static func segment(at x: CGFloat, widths: [CGFloat]) -> Int? {
+        guard !widths.isEmpty else { return nil }
+        var end = padding
+        for (index, width) in widths.enumerated() {
+            end += width
+            if x < end + spacing / 2 { return index }
+            end += spacing
+        }
+        return widths.count - 1
+    }
+
     /// Fasst alles sichtbar Angezeigte zusammen; ist er unverändert, muss nicht neu gezeichnet werden.
     var renderKey: String {
         var parts = ["\(darkMenuBar)", "\(colored)"]
-        for metric in prefs.menuBarMetrics {
+        for metric in metrics {
             switch metric {
             case .cpu: parts.append("c\(Int(monitor.cpu.total.rounded()))")
             case .gpu: parts.append("g\(Int((monitor.gpu?.utilization ?? 0).rounded()))")

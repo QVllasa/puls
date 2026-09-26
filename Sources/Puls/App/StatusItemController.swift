@@ -9,7 +9,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let state = PanelState()
     private(set) lazy var panel: GlassPanel = makePanel()
     private var outsideClickMonitor: Any?
-    private var keyMonitor: Any?
+    private var localMonitor: Any?
     private var lastLabelKey = ""
     private var lastRenderKey = ""
     private var appearanceObservation: NSKeyValueObservation?
@@ -95,9 +95,27 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     @objc private func buttonClicked(_ sender: NSStatusBarButton) {
         if NSApp.currentEvent?.type == .rightMouseUp {
             showMenu()
-        } else {
-            panel.isVisible ? closePanel() : openPanel()
+            return
         }
+        // Ein Klick auf einen Wert öffnet dessen Detailansicht, bei offenem Panel wechselt er dorthin.
+        // Zeigt das Panel diese Ansicht schon, schließt der Klick es wieder.
+        let route = clickedRoute(sender)
+        if !panel.isVisible {
+            openPanel(route: route)
+        } else if state.route == route {
+            closePanel()
+        } else {
+            state.route = route
+        }
+    }
+
+    /// Die Detailansicht des Werts unter dem Mauszeiger, ohne Werte in der Menüleiste die Übersicht.
+    private func clickedRoute(_ button: NSStatusBarButton) -> Route {
+        guard let event = NSApp.currentEvent, let image = button.image else { return .overview }
+        let label = MenuBarLabel(monitor: monitor, prefs: prefs)
+        let x = button.convert(event.locationInWindow, from: nil).x - (button.bounds.width - image.size.width) / 2
+        guard let index = MenuBarLabel.segment(at: x, widths: label.itemWidths()) else { return .overview }
+        return .detail(prefs.menuBarMetrics[index].module)
     }
 
     func openPanel(route: Route? = nil) {
@@ -116,9 +134,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             Task { @MainActor in self?.closePanel() }
         }
-        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard event.keyCode == 53 else { return event } // Escape
-            self?.closePanel()
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self else { return event }
+            // Escape, oder ein Klick in den durchsichtigen Schattenrand, zählt als Klick daneben.
+            let escape = event.type == .keyDown && event.keyCode == 53
+            let margin = event.type != .keyDown && event.window === self.panel
+                && self.panel.isInShadowMargin(event.locationInWindow)
+            guard escape || margin else { return event }
+            self.closePanel()
             return nil
         }
     }
@@ -126,9 +149,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     func closePanel() {
         guard panel.isVisible else { return }
         if let outsideClickMonitor { NSEvent.removeMonitor(outsideClickMonitor) }
-        if let keyMonitor { NSEvent.removeMonitor(keyMonitor) }
+        if let localMonitor { NSEvent.removeMonitor(localMonitor) }
         outsideClickMonitor = nil
-        keyMonitor = nil
+        localMonitor = nil
         monitor.isPanelVisible = false
         statusItem.button?.highlight(false)
         NSAnimationContext.runAnimationGroup({ ctx in
@@ -148,11 +171,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let anchor = buttonWindow.frame
         let screen = buttonWindow.screen ?? NSScreen.main
         let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        let size = NSSize(width: PanelMetrics.width, height: PanelMetrics.height)
-        var x = anchor.midX - size.width / 2
-        x = min(max(x, visible.minX + 8), visible.maxX - size.width - 8)
-        let y = anchor.minY - size.height - 6
-        panel.setFrame(NSRect(origin: NSPoint(x: x, y: y), size: size), display: true)
+        panel.setFrame(PanelMetrics.windowFrame(below: anchor, in: visible), display: true)
     }
 
     // MARK: Kontextmenü

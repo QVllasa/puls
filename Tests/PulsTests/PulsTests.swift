@@ -127,3 +127,49 @@ struct LiveTests {
         #expect(DiskSampler.volumes().contains { $0.path == "/" })
     }
 }
+
+@Suite("Panel und Menüleiste")
+struct PanelTests {
+    @Test func panelWindowLeavesRoomForTheGlassShadow() {
+        let anchor = NSRect(x: 1000, y: 1095, width: 176, height: 22)
+        let visible = NSRect(x: 0, y: 0, width: 1728, height: 1085)
+        let window = PanelMetrics.windowFrame(below: anchor, in: visible)
+        let glass = PanelMetrics.glassFrameInWindow.offsetBy(dx: window.minX, dy: window.minY)
+        #expect(PanelMetrics.shadowInsets.bottom > PanelMetrics.shadowInsets.top) // Schatten fällt nach unten
+        #expect(window.size == PanelMetrics.windowSize)
+        #expect(glass.size == NSSize(width: PanelMetrics.width, height: PanelMetrics.height))
+        #expect(glass.midX == anchor.midX)
+        #expect(glass.maxY == anchor.minY - 6)
+    }
+
+    @Test func panelStaysOnScreenAtTheRightEdge() {
+        let anchor = NSRect(x: 1650, y: 1095, width: 70, height: 22)
+        let visible = NSRect(x: 0, y: 0, width: 1728, height: 1085)
+        let window = PanelMetrics.windowFrame(below: anchor, in: visible)
+        let glass = PanelMetrics.glassFrameInWindow.offsetBy(dx: window.minX, dy: window.minY)
+        #expect(glass.maxX == visible.maxX - 8)
+    }
+
+    @Test func clickOnAMenuBarValueFindsItsMetric() {
+        // Drei Werte mit 40, 30 und 62 Punkt Breite, 9 Punkt Abstand, 2 Punkt Rand.
+        let widths: [CGFloat] = [40, 30, 62]
+        #expect(MenuBarLabel.segment(at: 1, widths: widths) == 0)
+        #expect(MenuBarLabel.segment(at: 20, widths: widths) == 0)
+        #expect(MenuBarLabel.segment(at: 46, widths: widths) == 0) // linke Hälfte des Abstands
+        #expect(MenuBarLabel.segment(at: 48, widths: widths) == 1) // rechte Hälfte des Abstands
+        #expect(MenuBarLabel.segment(at: 100, widths: widths) == 2)
+        #expect(MenuBarLabel.segment(at: 500, widths: widths) == 2)
+        #expect(MenuBarLabel.segment(at: -5, widths: widths) == 0)
+        #expect(MenuBarLabel.segment(at: 10, widths: []) == nil)
+    }
+
+    @Test func everyMenuBarMetricOpensAMatchingDetailView() {
+        #expect(MenuBarMetric.cpu.module == .cpu)
+        #expect(MenuBarMetric.gpu.module == .gpu)
+        #expect(MenuBarMetric.memory.module == .memory)
+        #expect(MenuBarMetric.network.module == .network)
+        #expect(MenuBarMetric.disk.module == .disk)
+        #expect(MenuBarMetric.temperature.module == .sensors)
+        #expect(MenuBarMetric.battery.module == .battery)
+    }
+}

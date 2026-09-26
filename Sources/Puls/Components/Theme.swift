@@ -80,4 +80,28 @@ enum PanelMetrics {
     static let width: CGFloat = 384
     static let height: CGFloat = 588
     static let cornerRadius: CGFloat = 30
+    /// Durchsichtiger Rand ums Glas: Liquid Glass zeichnet seinen Schatten außerhalb der runden Form.
+    /// Füllte das Glas das Fenster ganz aus, schnitte der rechteckige Fensterrand diesen Schatten ab
+    /// und hinter den runden Ecken bliebe ein eckiger Rahmen stehen. Gemessen reicht der Schatten
+    /// oben 25, seitlich 33 und unten 41 Punkt weit.
+    static let shadowInsets = NSEdgeInsets(top: 28, left: 36, bottom: 44, right: 36)
+
+    /// Lage des Glases im Fenster (AppKit-Koordinaten, Ursprung unten links).
+    static var glassFrameInWindow: CGRect {
+        CGRect(x: shadowInsets.left, y: shadowInsets.bottom, width: width, height: height)
+    }
+
+    static var windowSize: CGSize {
+        CGSize(width: width + shadowInsets.left + shadowInsets.right,
+               height: height + shadowInsets.top + shadowInsets.bottom)
+    }
+
+    /// Fensterrahmen samt Schattenrand, das Glas mittig 6 Punkt unter dem Menüleisten-Symbol.
+    static func windowFrame(below anchor: CGRect, in visible: CGRect) -> CGRect {
+        var x = anchor.midX - width / 2
+        x = min(max(x, visible.minX + 8), visible.maxX - width - 8)
+        let glassOrigin = CGPoint(x: x, y: anchor.minY - height - 6)
+        return CGRect(origin: CGPoint(x: glassOrigin.x - shadowInsets.left, y: glassOrigin.y - shadowInsets.bottom),
+                      size: windowSize)
+    }
 }

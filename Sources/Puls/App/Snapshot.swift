@@ -27,7 +27,8 @@ final class Snapshot {
         let screen = NSScreen.main?.visibleFrame ?? .zero
         let appearanceArg = CommandLine.arguments.contains("--light") ? NSAppearance(named: .aqua) : nil
         if let appearanceArg { NSApp.appearance = appearanceArg }
-        panel.setFrameTopLeftPoint(NSPoint(x: screen.maxX - PanelMetrics.width - 60, y: screen.maxY - 50))
+        let insets = PanelMetrics.shadowInsets
+        panel.setFrameTopLeftPoint(NSPoint(x: screen.maxX - PanelMetrics.width - 60 - insets.left, y: screen.maxY - 50 + insets.top))
         monitor.redactsAddresses = true
         monitor.start()
         monitor.isPanelVisible = true
