@@ -283,7 +283,7 @@ struct SensorsDetail: View {
             Sparkline(values: monitor.temperatureHistory.values, maxValue: 105, color: Module.sensors.tint).frame(height: 56)
             HStack {
                 if let t = s.gpu { LegendValue(label: "Graphics", value: temp(t), color: .purple) }
-                if let t = s.battery { LegendValue(label: "Battery", value: temp(t), color: .green) }
+                if let t = s.battery { LegendValue(label: "Battery cell", value: temp(t), color: .green) }
                 if let t = s.ssd { LegendValue(label: "SSD", value: temp(t), color: .indigo) }
             }
             InfoRow(label: "Thermal state", value: s.thermalLabel)

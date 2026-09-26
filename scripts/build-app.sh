@@ -20,7 +20,7 @@ lipo -create -output "$APP/Contents/MacOS/Puls" \
     .build/x86_64-apple-macosx/release/Puls
 strip -x "$APP/Contents/MacOS/Puls"
 sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD/" Resources/Info.plist > "$APP/Contents/Info.plist"
-cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+cp Resources/compiled/AppIcon.icns Resources/compiled/Assets.car "$APP/Contents/Resources/"
 cp -R Resources/en.lproj Resources/de.lproj "$APP/Contents/Resources/"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 

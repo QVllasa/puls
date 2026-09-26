@@ -1,0 +1,33 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.20000,0.42000,1.00000,1.00000",
+      "display-p3:0.78000,0.30000,0.86000,1.00000"
+    ],
+    "orientation" : {
+      "start" : { "x" : 0.1, "y" : 0.0 },
+      "stop" : { "x" : 0.9, "y" : 1.0 }
+    }
+  },
+  "groups" : [
+    {
+      "name" : "Pulse",
+      "layers" : [
+        { "name" : "pulse", "image-name" : "pulse.svg", "glass" : true }
+      ],
+      "shadow" : { "kind" : "neutral", "opacity" : 0.5 },
+      "translucency" : { "enabled" : false, "value" : 0.3 }
+    },
+    {
+      "name" : "Pane",
+      "layers" : [
+        { "name" : "pane", "image-name" : "pane.svg", "glass" : true, "opacity" : 0.55 }
+      ],
+      "shadow" : { "kind" : "neutral", "opacity" : 0.35 },
+      "translucency" : { "enabled" : true, "value" : 0.5 }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [ "macOS" ]
+  }
+}

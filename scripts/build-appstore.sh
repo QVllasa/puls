@@ -33,7 +33,7 @@ sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD/" -e "s/io.github.qvllas
     -e "s/© 2026 Qendrim Vllasa · MIT License/© 2026 Vllasa Ventures UG (haftungsbeschränkt)/" \
     Resources/Info.plist > "$APP/Contents/Info.plist"
 plutil -insert ITSAppUsesNonExemptEncryption -bool NO "$APP/Contents/Info.plist"
-cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+cp Resources/compiled/AppIcon.icns Resources/compiled/Assets.car "$APP/Contents/Resources/"
 cp -R Resources/en.lproj Resources/de.lproj "$APP/Contents/Resources/"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
