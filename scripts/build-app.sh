@@ -38,7 +38,7 @@ if [[ -f "$KEYCHAIN" ]] && security find-identity -v -p codesigning "$KEYCHAIN" 
         echo "▸ Notarisierung bei Apple …"
         ditto -c -k --keepParent "$APP" "dist/notarize.zip"
         xcrun notarytool submit "dist/notarize.zip" --key "${ASC_KEY_FILE/#\~/$HOME}" \
-            --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID" --wait --timeout 30m | tail -3
+            --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER_ID" --wait --timeout 2h | tail -3
         rm -f "dist/notarize.zip"
         xcrun stapler staple "$APP"
         spctl --assess --type execute --verbose=2 "$APP"
