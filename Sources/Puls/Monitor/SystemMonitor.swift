@@ -98,6 +98,13 @@ final class SystemMonitor {
         if let c = cpuSampler.sample() {
             cpu = c
             cpuHistory.append(c.total)
+        } else if cpu.cores.isEmpty {
+            // Direkt nach dem Start ist das Messfenster oft zu kurz. Nicht bis zum nächsten Takt warten,
+            // sonst zeigt das beim ersten Start geöffnete Panel „0 cores“.
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .milliseconds(250))
+                self?.tick()
+            }
         }
         if let g = GPUSampler.sample() {
             gpu = g
