@@ -15,12 +15,12 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
 nav { display: flex; align-items: center; gap: 12px; padding: 18px 0; }
-nav img { width: 32px; height: 32px; border-radius: 8px; }
+nav img { width: 34px; height: 34px; }
 nav b { font-size: 18px; }
 nav .links { margin-left: auto; display: flex; gap: 20px; font-size: 15px; }
 nav .links a { color: var(--muted); }
 .hero { text-align: center; padding: 56px 0 24px; }
-.hero img.icon { width: 128px; height: 128px; border-radius: 28px; box-shadow: 0 18px 40px rgba(91,92,240,.25); }
+.hero img.icon { width: 140px; height: 140px; filter: drop-shadow(0 16px 28px rgba(91,92,240,.35)); }
 .hero h1 { font-size: clamp(36px, 6vw, 56px); line-height: 1.08; margin: 24px 0 12px; letter-spacing: -.02em; }
 .hero p { font-size: clamp(18px, 2.4vw, 22px); color: var(--muted); max-width: 640px; margin: 0 auto; }
 .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 32px 0 8px; }
