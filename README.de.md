@@ -5,7 +5,7 @@
 <h1 align="center">Puls</h1>
 
 <p align="center">
-  Ein schlanker Systemmonitor für die macOS-Menüleiste – im Liquid-Glass-Design von macOS 26.<br>
+  Ein schlanker Systemmonitor für die macOS-Menüleiste, im Liquid-Glass-Design von macOS 26.<br>
   Inspiriert von iStat Menus, aber bewusst einfacher: ein Symbol, ein Panel, alles Wichtige auf einen Blick.
 </p>
 
@@ -53,19 +53,19 @@
 |---|---|---|
 | Preis | kostenlos | kostenlos |
 | CPU, GPU, Speicher, Netzwerk, Festplatte, Batterie | ✓ | ✓ |
-| CPU- und Chip-Temperaturen, Lüfter | ✓ | – (in der Sandbox nicht erlaubt) |
-| Top-Prozesse | ✓ | – (in der Sandbox nicht erlaubt) |
-| AirPods-Akkustände | ✓ | – |
+| CPU- und Chip-Temperaturen, Lüfter | ✓ | nein (von der Sandbox blockiert) |
+| Top-Prozesse | ✓ | nein (von der Sandbox blockiert) |
+| AirPods-Akkustände | ✓ | nein |
 | Thermischer Zustand, Leistungsaufnahme, Akku-Temperatur | ✓ | ✓ |
 | Updates | Hinweis in der App, Download von GitHub | automatisch über den App Store |
 | Signatur | Developer ID, von Apple beglaubigt | App Store |
 
-Bitte nur eine der beiden installieren – beide heißen „Puls“.
+Bitte nur eine der beiden installieren; beide heißen „Puls“.
 
 ## Installation
 
 1. `Puls-x.y.z.zip` aus dem [neuesten Release](https://github.com/QVllasa/puls/releases/latest) laden, entpacken und `Puls.app` in **Programme** ziehen.
-2. Öffnen – Puls erscheint oben rechts in der Menüleiste.
+2. Öffnen. Puls erscheint oben rechts in der Menüleiste.
 
 Voraussetzung: **macOS 26 (Tahoe)** oder neuer.
 

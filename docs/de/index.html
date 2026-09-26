@@ -3,43 +3,160 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Puls – Systemmonitor für die Mac-Menüleiste</title>
-<meta name="description" content="Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Menüleiste – im Liquid-Glass-Design von macOS Tahoe.">
-<link rel="icon" href="../assets/icon.png">
+<title>Puls: Systemmonitor für die Mac-Menüleiste</title>
+<meta name="description" content="Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Mac-Menüleiste, in einem ruhigen Liquid-Glass-Panel für macOS Tahoe. Kostenlos und Open Source.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f5fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14151c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://qvllasa.github.io/puls/de/">
+<link rel="alternate" hreflang="en" href="https://qvllasa.github.io/puls/">
+<link rel="alternate" hreflang="de" href="https://qvllasa.github.io/puls/de/">
+<link rel="alternate" hreflang="x-default" href="https://qvllasa.github.io/puls/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Puls">
+<meta property="og:title" content="Puls: Systemmonitor für die Mac-Menüleiste">
+<meta property="og:description" content="Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Mac-Menüleiste, in einem ruhigen Liquid-Glass-Panel für macOS Tahoe. Kostenlos und Open Source.">
+<meta property="og:url" content="https://qvllasa.github.io/puls/de/">
+<meta property="og:locale" content="de_DE">
+<meta property="og:image" content="https://qvllasa.github.io/puls/assets/og-de.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <link rel="stylesheet" href="../site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Puls", "operatingSystem": "macOS 26", "applicationCategory": "UtilitiesApplication", "softwareVersion": "1.1.0", "downloadUrl": "https://github.com/QVllasa/puls/releases/latest/download/Puls-1.1.0.zip", "url": "https://qvllasa.github.io/puls/de/", "inLanguage": ["en", "de"], "image": "https://qvllasa.github.io/puls/assets/icon.png", "screenshot": "https://qvllasa.github.io/puls/screenshots/de/overview-dark.png", "description": "Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Mac-Menüleiste, in einem ruhigen Liquid-Glass-Panel für macOS Tahoe. Kostenlos und Open Source.", "license": "https://opensource.org/licenses/MIT", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Organization", "name": "Vllasa Ventures UG (haftungsbeschränkt)", "url": "https://qvllasa.github.io/puls/"}}</script>
 </head>
 <body>
-<nav class="wrap"><a href="./"><img src="../assets/icon.png" alt=""></a><b>Puls</b><div class="links"><a href="./">Übersicht</a><a href="support.html">Support</a><a href="https://github.com/QVllasa/puls">GitHub</a><a href="../" lang="en">English</a></div></nav>
-<main class="wrap">
-  <section class="hero">
-    <img class="icon" src="../assets/icon.png" alt="Puls-Symbol">
+<a class="skip" href="#main">Zum Inhalt springen</a>
+<header class="site-header">
+  <a class="brand" href="../de/"><img src="../assets/favicon.png" alt="" width="28" height="28"><span>Puls</span></a>
+  <nav aria-label="Hauptnavigation">
+    <a href="#features">Funktionen</a><a href="#compare">Versionen</a><a href="#faq">Fragen</a><a href="../de/support.html">Support</a>
+    <a href="../" lang="en" hreflang="en">English</a>
+  </nav>
+</header>
+<main id="main">
+<section class="hero">
+  <div class="hero-copy">
+    <img class="app-icon" src="../assets/icon.png" alt="" width="112" height="112">
     <h1>Dein Mac auf einen Blick.</h1>
-    <p>Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Menüleiste – in einem ruhigen Glas-Panel, gemacht für macOS Tahoe.</p>
-    <div class="buttons">
-      <a class="btn primary" href="https://github.com/QVllasa/puls/releases/latest">Kostenlos laden</a>
-      <a class="btn secondary" href="https://github.com/QVllasa/puls">Quellcode auf GitHub</a>
+    <p class="lead">Puls sitzt in der Menüleiste und zeigt, was dein Mac gerade tut: Prozessor, Grafik, Speicher, Netzwerk, Festplatte, Thermik und Akku. Ein Klick öffnet die Details.</p>
+    <div class="download ">
+      <a class="button" href="https://github.com/QVllasa/puls/releases/latest/download/Puls-1.1.0.zip">Für Mac laden</a>
+      <p class="meta">Version 1.1.0, 2,3 MB, kostenlos. Braucht macOS 26 Tahoe auf Apple Silicon oder Intel.<br>Bald auch im Mac App Store.</p>
     </div>
-    <p class="note">Auch im Mac App Store (in Prüfung) · macOS 26 oder neuer · Apple Silicon &amp; Intel</p>
-  </section>
-  <div class="shot">
-    <picture>
-      <source srcset="../screenshots/de/overview-dark.png" media="(prefers-color-scheme: dark)">
-      <img src="../screenshots/de/overview-light.png" alt="Das Puls-Panel mit Kacheln für CPU, Grafik, Speicher, Netzwerk, Festplatte, Sensoren und Batterie">
-    </picture>
   </div>
-  <section class="grid">
-    <div class="card"><div class="sym">⚡︎</div><h3>CPU &amp; Grafik</h3><p>Gesamtauslastung, jeder Kern einzeln, Systemlast und GPU-Auslastung – mit Verlauf.</p></div>
-    <div class="card"><div class="sym">▦</div><h3>Speicher</h3><p>App-Speicher, fester und komprimierter Speicher, Cache, Speicherdruck und Auslagerung.</p></div>
-    <div class="card"><div class="sym">⇅</div><h3>Netzwerk</h3><p>Download und Upload live, Spitzenwerte, Verbindungsart, IP-Adressen und Datenmenge.</p></div>
-    <div class="card"><div class="sym">◧</div><h3>Festplatte</h3><p>Lese- und Schreibrate in Echtzeit und freier Speicherplatz aller Volumes.</p></div>
-    <div class="card"><div class="sym">♨︎</div><h3>Thermik &amp; Energie</h3><p>Thermischer Zustand, Leistungsaufnahme und Temperaturen im Blick.</p></div>
-    <div class="card"><div class="sym">▭</div><h3>Batterie</h3><p>Ladestand, Restlaufzeit, Zustand, Ladezyklen und die Akkus deiner Magic-Geräte.</p></div>
-  </section>
-  <section class="grid">
-    <div class="card"><h3>Deine Menüleiste</h3><p>Wähle selbst, welche Werte oben stehen. Farbige Ampel-Indikatoren zeigen sofort, wenn etwas unter Last steht.</p></div>
-    <div class="card"><h3>Einfach statt überladen</h3><p>Ein Symbol, ein Panel, alles Wichtige. Hell- und Dunkelmodus automatisch.</p></div>
-    <div class="card"><h3>Sparsam &amp; privat</h3><p>Kaum Rechenlast, keine Datensammlung, kein Konto, keine Werbung, kein Abo.</p></div>
-  </section>
+  <figure class="stage">
+    <div class="menubar" aria-hidden="true">
+      <span class="puls-item"><picture>
+        <source srcset="../screenshots/de/menubar-dark-clear.png" media="(prefers-color-scheme: dark)">
+        <img src="../screenshots/de/menubar-light-clear.png" alt="" width="274" height="22" decoding="async">
+      </picture></span>
+      <span class="clock">Fr. 09:41</span>
+    </div>
+    <div class="panel-drop">
+      <picture>
+        <source srcset="../screenshots/de/overview-dark.png" media="(prefers-color-scheme: dark)">
+        <img src="../screenshots/de/overview-light.png" alt="Das Puls-Panel, aus der Menüleiste geöffnet, mit Kacheln für CPU, Grafik, Speicher, Netzwerk, Festplatte, Sensoren und Batterie" width="384" height="588" decoding="async" fetchpriority="high" class="panel">
+      </picture>
+    </div>
+  </figure>
+</section>
+
+<section class="explore" id="features" aria-labelledby="explore-title">
+  <div class="section-head">
+    <h2 id="explore-title">Jeder Bereich deines Mac, einen Klick tiefer.</h2>
+    <p>Jede Kachel öffnet eine Detailansicht mit Verlauf, den Zahlen dahinter und was sie bedeuten.</p>
+  </div>
+  <div class="explorer">
+    <div role="tablist" aria-label="Funktionen" aria-orientation="vertical">
+      <button role="tab" id="tab-cpu" aria-controls="panel-cpu" aria-selected="true" tabindex="0"><span class="tab-title">Prozessor</span><span class="tab-text">Gesamtauslastung, jeder Kern nach Typ, Systemlast und Laufzeit. Die GitHub-Version zeigt zusätzlich die aktivsten Prozesse.</span></button><button role="tab" id="tab-memory" aria-controls="panel-memory" aria-selected="false" tabindex="-1"><span class="tab-title">Speicher</span><span class="tab-text">App-Speicher, fester und komprimierter Speicher, Cache, Speicherdruck und Auslagerung, verständlich erklärt.</span></button><button role="tab" id="tab-network" aria-controls="panel-network" aria-selected="false" tabindex="-1"><span class="tab-title">Netzwerk</span><span class="tab-text">Download und Upload live mit gespiegeltem Verlauf, Spitzenwerte, Verbindungsart, deine IP-Adressen und die Datenmenge seit dem Start.</span></button><button role="tab" id="tab-sensors" aria-controls="panel-sensors" aria-selected="false" tabindex="-1"><span class="tab-title">Sensoren</span><span class="tab-text">CPU- und Chip-Temperaturen, Lüfterdrehzahlen und die Leistungsaufnahme. Die App-Store-Version zeigt stattdessen den thermischen Zustand.</span></button><button role="tab" id="tab-battery" aria-controls="panel-battery" aria-selected="false" tabindex="-1"><span class="tab-title">Batterie</span><span class="tab-text">Ladestand, Restlaufzeit, maximale Kapazität, Ladezyklen, Ladeleistung und die Akkus deines Magic-Zubehörs.</span></button><button role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1"><span class="tab-title">Einstellungen</span><span class="tab-text">Wähle die Werte für die Menüleiste, farbige Indikatoren, das Aktualisierungsintervall und ob Puls beim Anmelden startet.</span></button>
+    </div>
+    <div class="explorer-view">
+      <div role="tabpanel" id="panel-cpu" aria-labelledby="tab-cpu"><img src="../screenshots/de/cpu.png" alt="Die CPU-Detailansicht mit Gesamtauslastung, Balken je Kern und Systemlast" width="384" height="588" decoding="async" loading="lazy"></div><div role="tabpanel" id="panel-memory" aria-labelledby="tab-memory" hidden><img src="../screenshots/de/memory.png" alt="Die Speicher-Detailansicht mit Belegungsring, Segmentbalken und Speicherdruck" width="384" height="588" decoding="async" loading="lazy"></div><div role="tabpanel" id="panel-network" aria-labelledby="tab-network" hidden><img src="../screenshots/de/network.png" alt="Die Netzwerk-Detailansicht mit Live-Raten, Verlauf und Verbindungsdetails" width="384" height="588" decoding="async" loading="lazy"></div><div role="tabpanel" id="panel-sensors" aria-labelledby="tab-sensors" hidden><img src="../screenshots/de/sensors.png" alt="Die Sensoren-Detailansicht mit CPU-Temperatur, beiden Lüftern und Leistungsaufnahme" width="384" height="588" decoding="async" loading="lazy"></div><div role="tabpanel" id="panel-battery" aria-labelledby="tab-battery" hidden><img src="../screenshots/de/battery.png" alt="Die Batterie-Detailansicht mit Ladering, Zustand und Ladezyklen" width="384" height="588" decoding="async" loading="lazy"></div><div role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" hidden><img src="../screenshots/de/settings.png" alt="Die Einstellungen mit Schaltern für die Menüleiste und allgemeinen Optionen" width="384" height="588" decoding="async" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="menubar-section" aria-labelledby="menubar-title">
+  <div class="section-head">
+    <h2 id="menubar-title">Still, bis etwas dich braucht.</h2>
+    <p>Wähle, welche Werte in deiner Menüleiste stehen. Jeder behält seine Zahl, du musst also nie nur anhand der Farbe raten. Der kleine Balken daneben wechselt mit steigender Last von Grün über Gelb zu Rot.</p>
+  </div>
+  <div class="bars">
+    <div class="bar dark"><img src="../screenshots/de/menubar-dark-clear.png" alt="Puls-Anzeige in einer dunklen Menüleiste" width="274" height="22" decoding="async" loading="lazy"></div>
+    <div class="bar light"><img src="../screenshots/de/menubar-light-clear.png" alt="Puls-Anzeige in einer hellen Menüleiste" width="274" height="22" decoding="async" loading="lazy"></div>
+  </div>
+  <ul class="legend"><li><span class="swatch ok" aria-hidden="true"></span><strong>Grün</strong> Normale Last</li><li><span class="swatch warn" aria-hidden="true"></span><strong>Gelb</strong> Beschäftigt, über 60 Prozent</li><li><span class="swatch high" aria-hidden="true"></span><strong>Rot</strong> Hoch, über 85 Prozent</li></ul>
+</section>
+
+<section class="values" aria-labelledby="values-title">
+  <h2 id="values-title">Gemacht, um nicht zu stören.</h2>
+  <div class="values-grid"><div><h3>Leicht für deinen Mac</h3><p>Puls misst alle zwei Sekunden und braucht dabei deutlich unter einem Prozent eines einzigen Kerns.</p></div><div><h3>Privat von Grund auf</h3><p>Kein Konto, keine Analyse, keine Werbung. Deine Messwerte verlassen deinen Mac nicht.</p></div><div><h3>Zu Hause auf Tahoe</h3><p>Gebaut mit SwiftUI und Liquid Glass, auf Deutsch und Englisch, in Hell und Dunkel.</p></div></div>
+</section>
+
+<section class="compare" id="compare" aria-labelledby="compare-title">
+  <div class="section-head">
+    <h2 id="compare-title">Zwei Wege zu Puls.</h2>
+    <p>Beide sind kostenlos. Die App-Store-Version läuft in Apples Sandbox, die Sensoren und andere Apps abschirmt, deshalb zeigt sie etwas weniger.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><td></td><th scope="col">GitHub</th><th scope="col">Mac App Store</th></tr></thead>
+      <tbody><tr><th scope="row">Prozessor, Grafik, Speicher, Netzwerk, Festplatte, Batterie</th><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td></tr><tr><th scope="row">Thermischer Zustand, Leistungsaufnahme, Akku-Temperatur</th><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td></tr><tr><th scope="row">CPU- und Chip-Temperaturen, Lüfter</th><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td><td><span class="mark no" aria-hidden="true"></span><span class="sr">Nicht verfügbar</span></td></tr><tr><th scope="row">Aktivste Prozesse</th><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td><td><span class="mark no" aria-hidden="true"></span><span class="sr">Nicht verfügbar</span></td></tr><tr><th scope="row">Akkustände von AirPods</th><td><span class="mark yes" aria-hidden="true"></span><span class="sr">Enthalten</span></td><td><span class="mark no" aria-hidden="true"></span><span class="sr">Nicht verfügbar</span></td></tr><tr><th scope="row">Updates</th><td>Hinweis im Panel</td><td>Automatisch</td></tr><tr><th scope="row">Signiert durch</th><td>Developer ID, von Apple notarisiert</td><td>Mac App Store</td></tr></tbody>
+    </table>
+  </div>
+  <p class="note">Bitte nur eine der beiden installieren. Beide heißen Puls.</p>
+</section>
+
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">Fragen</h2>
+  <div class="faq-list"><details><summary>Wo ist Puls, nachdem ich es geöffnet habe?</summary><p>Puls lebt in der Menüleiste und hat kein Dock-Symbol. Die Werte stehen oben rechts auf dem Bildschirm; ein Klick öffnet das Panel, ein Rechtsklick ein kleines Menü.</p></details><details><summary>Wie beende ich Puls?</summary><p>Rechtsklick auf die Puls-Anzeige und Puls beenden wählen, oder im Panel die Einstellungen öffnen und auf Beenden klicken.</p></details><details><summary>Startet Puls mit meinem Mac?</summary><p>Die GitHub-Version ab dem ersten Start, die App-Store-Version fragt vorher. Ändern kannst du das jederzeit in den Einstellungen unter Beim Anmelden starten.</p></details><details><summary>Welche Sprachen spricht Puls?</summary><p>Deutsch und Englisch. Puls folgt der Sprache in den Systemeinstellungen unter Allgemein, Sprache und Region.</p></details><details><summary>Ist Puls wirklich kostenlos?</summary><p>Ja. Puls ist Open Source unter der MIT-Lizenz, ohne Werbung, Abo oder In-App-Käufe.</p></details></div>
+  <p class="note"><a href="support.html">Mehr Antworten auf der Support-Seite.</a></p>
+</section>
+
+<section class="closing" aria-labelledby="closing-title">
+  <img class="app-icon" src="../assets/icon.png" alt="" width="96" height="96" loading="lazy">
+  <h2 id="closing-title">Sieh, was dein Mac gerade tut.</h2>
+  <div class="download center">
+      <a class="button" href="https://github.com/QVllasa/puls/releases/latest/download/Puls-1.1.0.zip">Für Mac laden</a>
+      <p class="meta">Version 1.1.0, 2,3 MB, kostenlos. Braucht macOS 26 Tahoe auf Apple Silicon oder Intel.<br>Bald auch im Mac App Store.</p>
+    </div>
+  <p class="source"><a href="https://github.com/QVllasa/puls">Quellcode auf GitHub</a></p>
+</section>
 </main>
-<footer><div class="wrap"><span>© 2026 Vllasa Ventures UG (haftungsbeschränkt)</span><a href="support.html">Support</a><a href="datenschutz.html">Datenschutz</a><a href="impressum.html">Impressum</a></div></footer>
-</body></html>
+<script>
+(() => {
+  const tabs = [...document.querySelectorAll('[role=tab]')];
+  const select = (tab, focus) => {
+    tabs.forEach(t => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', on);
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tab.focus();
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', e => {
+      const d = {ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1}[e.key];
+      if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length], true); }
+      if (e.key === 'Home') { e.preventDefault(); select(tabs[0], true); }
+      if (e.key === 'End') { e.preventDefault(); select(tabs[tabs.length - 1], true); }
+    });
+  });
+})();
+</script>
+<footer class="site-footer">
+  <p>Puls ist ein Produkt der Vllasa Ventures UG (haftungsbeschränkt).</p>
+  <nav aria-label="Rechtliches">
+    <a href="../de/support.html">Support</a>
+    <a href="../de/datenschutz.html">Datenschutz</a>
+    <a href="../de/impressum.html">Impressum</a>
+    <a href="https://github.com/QVllasa/puls">GitHub</a>
+  </nav>
+</footer>
+</body>
+</html>

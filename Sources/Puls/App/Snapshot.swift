@@ -82,6 +82,12 @@ final class Snapshot {
             if let image = renderer.cgImage {
                 Self.write(image, to: directory.appendingPathComponent(dark ? "menubar-dark.png" : "menubar-light.png"))
             }
+            // Ohne Hintergrund, für eigene Menüleisten-Darstellungen (z. B. auf der Webseite)
+            let clear = ImageRenderer(content: MenuBarLabel(monitor: monitor, prefs: .shared, darkMenuBar: dark).padding(.horizontal, 4))
+            clear.scale = 3
+            if let image = clear.cgImage {
+                Self.write(image, to: directory.appendingPathComponent(dark ? "menubar-dark-clear.png" : "menubar-light-clear.png"))
+            }
         }
     }
 

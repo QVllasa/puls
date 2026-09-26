@@ -5,7 +5,7 @@
 <h1 align="center">Puls</h1>
 
 <p align="center">
-  A lightweight system monitor for the macOS menu bar – in the Liquid Glass design of macOS 26.<br>
+  A lightweight system monitor for the macOS menu bar, in the Liquid Glass design of macOS 26.<br>
   Inspired by iStat Menus, but deliberately simpler: one menu bar item, one panel, everything important at a glance.
 </p>
 
@@ -37,7 +37,7 @@
 | **Sensors** | CPU temperature, fans, watts | Average and hottest core, graphics/battery/SSD, fan speeds, system power draw, all sensors |
 | **Battery** | Charge, time remaining | Maximum capacity, cycle count, temperature, charging/discharging power, adapter, AirPods / Magic accessories |
 
-**Menu bar:** choose what appears at the top (CPU, graphics, memory, network, disk, temperature, battery) – with colored status indicators that turn yellow or red under load, or plain monochrome.
+**Menu bar:** choose what appears at the top (CPU, graphics, memory, network, disk, temperature, battery), with colored status indicators that turn yellow or red under load, or in plain monochrome.
 
 <p align="center">
   <img src="docs/screenshots/en/menubar-dark.png" height="36" alt="Menu bar (dark)"><br>
@@ -61,14 +61,14 @@
 |---|---|---|
 | Price | free | free |
 | CPU / GPU / memory / network / disk / battery | ✓ | ✓ |
-| CPU & chip temperatures, fan speeds | ✓ | – (not allowed in the App Sandbox) |
-| Top processes | ✓ | – (not allowed in the App Sandbox) |
-| AirPods battery levels | ✓ | – |
+| CPU & chip temperatures, fan speeds | ✓ | no (blocked by the App Sandbox) |
+| Top processes | ✓ | no (blocked by the App Sandbox) |
+| AirPods battery levels | ✓ | no |
 | Thermal state, power draw, battery temperature | ✓ | ✓ |
 | Updates | in-app notice, download from GitHub | automatic via the App Store |
 | Code signing | Developer ID, notarized by Apple | App Store |
 
-Please install only one of them – both are called “Puls”.
+Please install only one of them; both are called “Puls”.
 
 ## Usage
 
@@ -86,7 +86,7 @@ Requires **macOS 26 (Tahoe)** or later.
 
 ## Privacy
 
-Puls collects nothing. All values are read locally. The only network requests: once a day the GitHub version asks api.github.com for a newer release (can be turned off), and – only if you enable it – Puls looks up your public IP via [api.ipify.org](https://www.ipify.org). Full policy: [privacy](https://qvllasa.github.io/puls/privacy.html).
+Puls collects nothing. All values are read locally. The only network requests: once a day the GitHub version asks api.github.com for a newer release (can be turned off), and, only if you enable it, Puls looks up your public IP via [api.ipify.org](https://www.ipify.org). Full policy: [privacy](https://qvllasa.github.io/puls/privacy.html).
 
 ## Build it yourself
 
@@ -127,4 +127,4 @@ Tested on MacBook Pro M2 Pro and M5 Pro, and on Intel in CI.
 
 ## License
 
-[MIT](LICENSE) – you may use, modify and share Puls freely.
+[MIT](LICENSE): you may use, modify and share Puls freely.
