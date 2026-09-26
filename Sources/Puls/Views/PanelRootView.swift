@@ -13,7 +13,11 @@ final class PanelState {
     var close: () -> Void = {}
 
     func go(_ route: Route) {
-        withAnimation(.smooth(duration: 0.32)) { self.route = route }
+        if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            self.route = route
+        } else {
+            withAnimation(.smooth(duration: 0.32)) { self.route = route }
+        }
     }
 }
 
@@ -61,29 +65,29 @@ struct PanelHeader: View {
                     Text(monitor.displayComputerName)
                         .font(.headline)
                         .lineLimit(1)
-                    Text("\(monitor.machine.chip) · \(Fmt.memory(monitor.machine.physicalMemory)) · seit \(Fmt.uptime(monitor.uptime))")
+                    Text("\(monitor.machine.chip) · \(Fmt.memory(monitor.machine.physicalMemory)) · up \(Fmt.uptime(monitor.uptime))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                         .contentTransition(.numericText())
                 }
                 Spacer(minLength: 4)
-                GlassIconButton(symbol: "gearshape", help: "Einstellungen") { state.go(.settings) }
+                GlassIconButton(symbol: "gearshape", help: "Settings") { state.go(.settings) }
             case .detail(let module):
-                GlassIconButton(symbol: "chevron.left", help: "Zurück") { state.go(.overview) }
+                GlassIconButton(symbol: "chevron.left", help: "Back") { state.go(.overview) }
                 Image(systemName: module.symbol)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(module.tint.gradient)
                 Text(module.title).font(.title3.weight(.semibold))
                 Spacer()
                 if module == .cpu || module == .memory {
-                    GlassIconButton(symbol: "waveform.path.ecg.rectangle", help: "Aktivitätsanzeige öffnen") {
+                    GlassIconButton(symbol: "waveform.path.ecg.rectangle", help: "Open Activity Monitor") {
                         Actions.openActivityMonitor(); state.close()
                     }
                 }
             case .settings:
-                GlassIconButton(symbol: "chevron.left", help: "Zurück") { state.go(.overview) }
-                Text("Einstellungen").font(.title3.weight(.semibold))
+                GlassIconButton(symbol: "chevron.left", help: "Back") { state.go(.overview) }
+                Text("Settings").font(.title3.weight(.semibold))
                 Spacer()
             }
         }
@@ -104,7 +108,8 @@ struct GlassIconButton: View {
         }
         .buttonStyle(.glass)
         .buttonBorderShape(.circle)
-        .help(help)
+        .help(Text(LocalizedStringKey(help)))
+        .accessibilityLabel(Text(LocalizedStringKey(help)))
     }
 }
 
@@ -122,6 +127,7 @@ struct AppGlyph: View {
         }
         .frame(width: size, height: size)
         .shadow(color: .purple.opacity(0.3), radius: 6, y: 2)
+        .accessibilityHidden(true)
     }
 }
 

@@ -14,13 +14,13 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable {
 
     var title: String {
         switch self {
-        case .cpu: "CPU"
-        case .gpu: "Grafik"
-        case .memory: "Speicher"
-        case .network: "Netzwerk"
-        case .disk: "Festplatte"
-        case .temperature: "Temperatur"
-        case .battery: "Batterie"
+        case .cpu: String(localized: "CPU")
+        case .gpu: String(localized: "Graphics")
+        case .memory: String(localized: "Memory")
+        case .network: String(localized: "Network")
+        case .disk: String(localized: "Disk")
+        case .temperature: String(localized: "Temperature")
+        case .battery: String(localized: "Battery")
         }
     }
 }
@@ -46,6 +46,9 @@ final class Preferences {
     /// Store-Version: Der Nutzer hat die Autostart-Frage beantwortet (Regel 2.4.5: nur mit Zustimmung).
     var loginItemQuestionAnswered: Bool {
         didSet { defaults.set(loginItemQuestionAnswered, forKey: "loginItemQuestionAnswered") }
+    }
+    var checkForUpdates: Bool {
+        didSet { defaults.set(checkForUpdates, forKey: "checkForUpdates") }
     }
     var coloredMenuBar: Bool {
         didSet { defaults.set(coloredMenuBar, forKey: "coloredMenuBar") }
@@ -77,6 +80,7 @@ final class Preferences {
             "useFahrenheit": false,
             "fetchPublicIP": !Flavor.isAppStore, // Store: Fremddienst nur nach eigener Wahl
             "coloredMenuBar": true,
+            "checkForUpdates": true,
         ])
         let raw = defaults.stringArray(forKey: "menuBarMetrics") ?? []
         menuBarMetrics = raw.compactMap(MenuBarMetric.init(rawValue:)).filter(MenuBarMetric.available.contains)
@@ -84,6 +88,7 @@ final class Preferences {
         useFahrenheit = defaults.bool(forKey: "useFahrenheit")
         fetchPublicIP = defaults.bool(forKey: "fetchPublicIP")
         coloredMenuBar = defaults.bool(forKey: "coloredMenuBar")
+        checkForUpdates = defaults.bool(forKey: "checkForUpdates")
         loginItemQuestionAnswered = defaults.bool(forKey: "loginItemQuestionAnswered")
         launchAtLogin = Self.loginItemIsOn
     }

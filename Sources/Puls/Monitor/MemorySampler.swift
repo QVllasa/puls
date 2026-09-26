@@ -6,9 +6,9 @@ enum MemoryPressure: Int {
 
     var label: String {
         switch self {
-        case .normal: "Normal"
-        case .warning: "Erhöht"
-        case .critical: "Kritisch"
+        case .normal: String(localized: "Normal")
+        case .warning: String(localized: "Elevated")
+        case .critical: String(localized: "Critical")
         }
     }
 }

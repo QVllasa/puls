@@ -40,14 +40,14 @@ struct SectionCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 10) {
             if let title {
                 HStack {
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
                         .kerning(0.4)
                     Spacer()
                     if let trailing {
-                        Text(trailing).font(.caption).foregroundStyle(.tertiary)
+                        Text(LocalizedStringKey(trailing)).font(.caption).foregroundStyle(.tertiary)
                     }
                 }
             }
@@ -71,9 +71,9 @@ struct InfoRow: View {
             if let dot {
                 Circle().fill(dot.gradient).frame(width: 8, height: 8)
             }
-            Text(label).foregroundStyle(.secondary)
+            Text(LocalizedStringKey(label)).foregroundStyle(.secondary)
             Spacer(minLength: 8)
-            Text(copied ? "Kopiert" : value)
+            Text(copied ? String(localized: "Copied") : value)
                 .monospacedDigit()
                 .foregroundStyle(copied ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
                 .lineLimit(1)
@@ -87,6 +87,9 @@ struct InfoRow: View {
         }
         .font(.callout)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(copyable ? .isButton : [])
+        .accessibilityHint(copyable ? Text("Copies the value") : Text(""))
         .onTapGesture {
             guard copyable, value != "–" else { return }
             NSPasteboard.general.clearContents()
@@ -94,7 +97,7 @@ struct InfoRow: View {
             withAnimation(.snappy) { copied = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { withAnimation(.snappy) { copied = false } }
         }
-        .help(copyable ? "Klicken zum Kopieren" : "")
+        .help(copyable ? String(localized: "Click to copy") : "")
     }
 }
 
@@ -112,8 +115,9 @@ struct BigValue: View {
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .contentTransition(.numericText())
-            Text(caption).font(.caption).foregroundStyle(.secondary)
+            Text(LocalizedStringKey(caption)).font(.caption).foregroundStyle(.secondary)
         }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -126,7 +130,7 @@ struct LegendValue: View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 5) {
                 Circle().fill(color.gradient).frame(width: 7, height: 7)
-                Text(label).font(.caption).foregroundStyle(.secondary)
+                Text(LocalizedStringKey(label)).font(.caption).foregroundStyle(.secondary)
             }
             Text(value)
                 .font(.system(.callout, design: .rounded).weight(.semibold))
@@ -134,6 +138,7 @@ struct LegendValue: View {
                 .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -145,7 +150,7 @@ struct ProcessList: View {
     var body: some View {
         VStack(spacing: 8) {
             if rows.isEmpty {
-                HStack { ProgressView().controlSize(.small); Text("Wird geladen …").foregroundStyle(.secondary) }
+                HStack { ProgressView().controlSize(.small); Text("Loading …").foregroundStyle(.secondary) }
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -160,6 +165,7 @@ struct ProcessList: View {
                         .contentTransition(.numericText())
                 }
                 .font(.callout)
+                .accessibilityElement(children: .combine)
             }
         }
         .animation(.snappy, value: rows.map(\.id))
@@ -193,5 +199,6 @@ struct ProcessIcon: View {
             }
         }
         .frame(width: 18, height: 18)
+        .accessibilityHidden(true)
     }
 }

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, macos-26-intel]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Toolchain
+        run: swift --version && sw_vers && uname -m
+      - name: Build (GitHub version)
+        run: swift build
+      - name: Build (App Store version)
+        run: swift build -Xswiftc -DAPPSTORE -Xcc -DAPPSTORE --build-path .build-store
+      - name: Unit tests
+        run: swift test
+      - name: Live readings
+        run: .build/debug/Puls --dump
+
+  app:
+    name: Universal app
+    needs: test
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Build Puls.app
+        run: scripts/build-app.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Puls-app
+          path: |
+            dist/Puls-*.zip
+            dist/Puls-*.zip.sha256

@@ -1,12 +1,15 @@
 import Foundation
 
 enum Fmt {
+    /// Sprache der Oberfläche (folgt der vom System gewählten Lokalisierung der App).
+    static let isGerman = Bundle.main.preferredLocalizations.first?.hasPrefix("de") ?? false
+
     private static func number(_ value: Double, digits: Int) -> String {
         value.formatted(.number.precision(.fractionLength(digits)).grouping(.automatic))
     }
 
     static func percent(_ value: Double) -> String {
-        "\(Int(value.rounded()))\u{202F}%"
+        "\(Int(value.rounded()))" + (isGerman ? "\u{202F}%" : "%")
     }
 
     /// Arbeitsspeicher (binär, wie in der Aktivitätsanzeige).
@@ -51,21 +54,21 @@ enum Fmt {
     }
 
     static func rpm(_ value: Double) -> String {
-        "\(number(value, digits: 0)) U/min"
+        String(localized: "\(number(value, digits: 0)) rpm")
     }
 
     static func minutes(_ total: Int) -> String {
         let h = total / 60, m = total % 60
-        if h == 0 { return "\(m) Min" }
-        return m == 0 ? "\(h) Std" : "\(h) Std \(m) Min"
+        if h == 0 { return String(localized: "\(m) min") }
+        return m == 0 ? String(localized: "\(h) h") : String(localized: "\(h) h \(m) min")
     }
 
     static func uptime(_ seconds: TimeInterval) -> String {
         let minutes = Int(seconds / 60)
         let days = minutes / 1440, hours = (minutes % 1440) / 60, mins = minutes % 60
-        if days > 0 { return "\(days) T \(hours) Std" }
-        if hours > 0 { return "\(hours) Std \(mins) Min" }
-        return "\(mins) Min"
+        if days > 0 { return String(localized: "\(days) d \(hours) h") }
+        if hours > 0 { return String(localized: "\(hours) h \(mins) min") }
+        return String(localized: "\(mins) min")
     }
 
     static func load(_ value: Double) -> String { number(value, digits: 2) }

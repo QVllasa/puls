@@ -16,10 +16,10 @@ struct BatteryStats: Equatable {
     var condition: String?
 
     var stateLabel: String {
-        if isFullyCharged && isPluggedIn { return "Voll geladen" }
-        if isCharging { return "Wird geladen" }
-        if isPluggedIn { return "Am Netzteil" }
-        return "Batteriebetrieb"
+        if isFullyCharged && isPluggedIn { return String(localized: "Fully charged") }
+        if isCharging { return String(localized: "Charging") }
+        if isPluggedIn { return String(localized: "On power adapter") }
+        return String(localized: "On battery")
     }
 
     var symbolName: String {

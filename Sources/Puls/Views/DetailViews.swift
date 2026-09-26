@@ -27,19 +27,19 @@ struct CPUDetail: View {
         let cpu = monitor.cpu
         SectionCard {
             HStack(alignment: .top) {
-                BigValue(value: Fmt.percent(cpu.total), caption: "Auslastung gesamt",
+                BigValue(value: Fmt.percent(cpu.total), caption: "Total load",
                          color: Theme.level(cpu.total, base: .primary))
                 Spacer()
                 RingGauge(value: cpu.total, color: Module.cpu.tint, lineWidth: 7).frame(width: 46, height: 46)
             }
             Sparkline(values: monitor.cpuHistory.values, maxValue: 100, color: Module.cpu.tint).frame(height: 64)
             HStack {
-                LegendValue(label: "Nutzer", value: Fmt.percent(cpu.user), color: .blue)
+                LegendValue(label: "User", value: Fmt.percent(cpu.user), color: .blue)
                 LegendValue(label: "System", value: Fmt.percent(cpu.system), color: .red)
-                LegendValue(label: "Leerlauf", value: Fmt.percent(cpu.idle), color: .gray)
+                LegendValue(label: "Idle", value: Fmt.percent(cpu.idle), color: .gray)
             }
         }
-        SectionCard(title: "Kerne", trailing: "\(cpu.cores.count) insgesamt") {
+        SectionCard(title: "Cores", trailing: String(localized: "\(cpu.cores.count) total")) {
             ForEach(monitor.coreGroups) { group in
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
@@ -51,16 +51,16 @@ struct CPUDetail: View {
                 }
             }
         }
-        SectionCard(title: "Systemlast") {
+        SectionCard(title: "System load") {
             HStack {
-                LegendValue(label: "1 Min", value: Fmt.load(cpu.load[0]), color: .blue)
-                LegendValue(label: "5 Min", value: Fmt.load(cpu.load[1]), color: .blue.opacity(0.7))
-                LegendValue(label: "15 Min", value: Fmt.load(cpu.load[2]), color: .blue.opacity(0.45))
+                LegendValue(label: "1 min", value: Fmt.load(cpu.load[0]), color: .blue)
+                LegendValue(label: "5 min", value: Fmt.load(cpu.load[1]), color: .blue.opacity(0.7))
+                LegendValue(label: "15 min", value: Fmt.load(cpu.load[2]), color: .blue.opacity(0.45))
             }
-            InfoRow(label: "Eingeschaltet seit", value: Fmt.uptime(monitor.uptime))
+            InfoRow(label: "Up for", value: Fmt.uptime(monitor.uptime))
         }
         if Flavor.hasProcesses {
-            SectionCard(title: "Prozesse", trailing: "nach CPU") {
+            SectionCard(title: "Processes", trailing: "by CPU") {
                 ProcessList(rows: monitor.topCPU, mode: .cpu)
             }
         }
@@ -86,7 +86,7 @@ struct GPUDetail: View {
         let gpu = monitor.gpu ?? GPUStats()
         SectionCard {
             HStack(alignment: .top) {
-                BigValue(value: Fmt.percent(gpu.utilization), caption: "Auslastung",
+                BigValue(value: Fmt.percent(gpu.utilization), caption: "Utilization",
                          color: Theme.level(gpu.utilization, base: .primary))
                 Spacer()
                 RingGauge(value: gpu.utilization, color: Module.gpu.tint, lineWidth: 7).frame(width: 46, height: 46)
@@ -94,16 +94,16 @@ struct GPUDetail: View {
             Sparkline(values: monitor.gpuHistory.values, maxValue: 100, color: Module.gpu.tint).frame(height: 64)
             HStack {
                 LegendValue(label: "Renderer", value: Fmt.percent(gpu.renderer), color: .purple)
-                LegendValue(label: "Grafikspeicher", value: Fmt.memory(gpu.memoryInUse), color: .pink)
+                LegendValue(label: "Graphics memory", value: Fmt.memory(gpu.memoryInUse), color: .pink)
             }
         }
-        SectionCard(title: "Grafikchip") {
-            InfoRow(label: "Modell", value: gpu.name)
-            if let cores = gpu.coreCount { InfoRow(label: "GPU-Kerne", value: "\(cores)") }
+        SectionCard(title: "Graphics chip") {
+            InfoRow(label: "Model", value: gpu.name)
+            if let cores = gpu.coreCount { InfoRow(label: "GPU cores", value: "\(cores)") }
             if let t = monitor.sensors.gpu {
-                InfoRow(label: "Temperatur", value: Fmt.temperature(t, fahrenheit: prefs.useFahrenheit))
+                InfoRow(label: "Temperature", value: Fmt.temperature(t, fahrenheit: prefs.useFahrenheit))
             }
-            InfoRow(label: "Speicher", value: "Gemeinsam mit dem Arbeitsspeicher")
+            InfoRow(label: "Memory", value: String(localized: "Shared with system memory"))
         }
     }
 }
@@ -117,7 +117,7 @@ struct MemoryDetail: View {
         let m = monitor.memory
         SectionCard {
             HStack(alignment: .top) {
-                BigValue(value: Fmt.memory(m.used), caption: "belegt von \(Fmt.memory(m.total))")
+                BigValue(value: Fmt.memory(m.used), caption: String(localized: "used of \(Fmt.memory(m.total))"))
                 Spacer()
                 ZStack {
                     RingGauge(value: m.usedPercent, color: Module.memory.tint, lineWidth: 7)
@@ -132,19 +132,19 @@ struct MemoryDetail: View {
                 .init(id: "compressed", value: Double(m.compressed), color: .orange),
             ], total: Double(m.total))
             VStack(spacing: 7) {
-                InfoRow(label: "App-Speicher", value: Fmt.memory(m.app), dot: .mint)
-                InfoRow(label: "Fester Speicher", value: Fmt.memory(m.wired), dot: .blue)
-                InfoRow(label: "Komprimiert", value: Fmt.memory(m.compressed), dot: .orange)
-                InfoRow(label: "Im Cache", value: Fmt.memory(m.cached), dot: .gray.opacity(0.5))
+                InfoRow(label: "App memory", value: Fmt.memory(m.app), dot: .mint)
+                InfoRow(label: "Wired memory", value: Fmt.memory(m.wired), dot: .blue)
+                InfoRow(label: "Compressed", value: Fmt.memory(m.compressed), dot: .orange)
+                InfoRow(label: "Cached", value: Fmt.memory(m.cached), dot: .gray.opacity(0.5))
             }
         }
-        SectionCard(title: "Speicherdruck", trailing: m.pressure.label) {
+        SectionCard(title: "Memory pressure", trailing: m.pressure.label) {
             MeterBar(value: max(m.pressurePercent, 2), color: pressureColor(m.pressure), height: 8)
-            InfoRow(label: "Auslastung des Speichers", value: Fmt.percent(m.pressurePercent))
-            InfoRow(label: "Auslagerung (Swap)", value: m.swapUsed > 0 ? "\(Fmt.memory(m.swapUsed)) von \(Fmt.memory(m.swapTotal))" : "Keine")
+            InfoRow(label: "Memory load", value: Fmt.percent(m.pressurePercent))
+            InfoRow(label: "Swap used", value: m.swapUsed > 0 ? String(localized: "\(Fmt.memory(m.swapUsed)) of \(Fmt.memory(m.swapTotal))") : String(localized: "None"))
         }
         if Flavor.hasProcesses {
-            SectionCard(title: "Prozesse", trailing: "nach Speicher") {
+            SectionCard(title: "Processes", trailing: "by memory") {
                 ProcessList(rows: monitor.topMemory, mode: .memory)
             }
         }
@@ -177,26 +177,26 @@ struct NetworkDetail: View {
                         topColor: Theme.download, bottomColor: Theme.upload)
                 .frame(height: 84)
             HStack {
-                LegendValue(label: "Spitze ↓", value: Fmt.rate(monitor.downloadHistory.max), color: Theme.download)
-                LegendValue(label: "Spitze ↑", value: Fmt.rate(monitor.uploadHistory.max), color: Theme.upload)
+                LegendValue(label: "Peak ↓", value: Fmt.rate(monitor.downloadHistory.max), color: Theme.download)
+                LegendValue(label: "Peak ↑", value: Fmt.rate(monitor.uploadHistory.max), color: Theme.upload)
             }
         }
-        SectionCard(title: "Verbindung", trailing: n.interfaceName) {
-            InfoRow(label: "Art", value: n.interfaceKind)
-            InfoRow(label: "Lokale IP", value: monitor.displayLocalIP ?? "–", copyable: true)
+        SectionCard(title: "Connection", trailing: n.interfaceName) {
+            InfoRow(label: "Type", value: n.interfaceKind)
+            InfoRow(label: "Local IP", value: monitor.displayLocalIP ?? "–", copyable: true)
             if prefs.fetchPublicIP {
-                InfoRow(label: "Öffentliche IP",
-                        value: monitor.displayPublicIP ?? (monitor.publicIPLoading ? "Wird ermittelt …" : "–"),
+                InfoRow(label: "Public IP",
+                        value: monitor.displayPublicIP ?? (monitor.publicIPLoading ? String(localized: "Looking up …") : "–"),
                         copyable: monitor.publicIP != nil)
             }
-            Button("Netzwerkeinstellungen …") { Actions.openNetworkSettings() }
+            Button("Network Settings …") { Actions.openNetworkSettings() }
                 .buttonStyle(.link)
                 .font(.callout)
         }
-        SectionCard(title: "Datenmenge seit Systemstart") {
+        SectionCard(title: "Data since startup") {
             HStack {
-                LegendValue(label: "Empfangen", value: Fmt.storage(n.totalReceived), color: Theme.download)
-                LegendValue(label: "Gesendet", value: Fmt.storage(n.totalSent), color: Theme.upload)
+                LegendValue(label: "Received", value: Fmt.storage(n.totalReceived), color: Theme.download)
+                LegendValue(label: "Sent", value: Fmt.storage(n.totalSent), color: Theme.upload)
             }
         }
     }
@@ -208,10 +208,10 @@ struct DiskDetail: View {
     @Environment(SystemMonitor.self) private var monitor
 
     var body: some View {
-        SectionCard(title: "Aktivität") {
+        SectionCard(title: "Activity") {
             HStack {
-                LegendValue(label: "Lesen", value: Fmt.rate(monitor.disk.read), color: Theme.read)
-                LegendValue(label: "Schreiben", value: Fmt.rate(monitor.disk.write), color: Theme.write)
+                LegendValue(label: "Read", value: Fmt.rate(monitor.disk.read), color: Theme.read)
+                LegendValue(label: "Write", value: Fmt.rate(monitor.disk.write), color: Theme.write)
             }
             MirrorChart(top: monitor.readHistory.values, bottom: monitor.writeHistory.values,
                         topColor: Theme.read, bottomColor: Theme.write)
@@ -226,17 +226,17 @@ struct DiskDetail: View {
                                 .foregroundStyle(Module.disk.tint.gradient)
                             Text(volume.name).font(.callout.weight(.medium))
                             Spacer()
-                            Text("\(Fmt.storage(volume.available)) frei")
+                            Text("\(Fmt.storage(volume.available)) free")
                                 .font(.callout).monospacedDigit().foregroundStyle(.secondary)
                         }
                         MeterBar(value: volume.usedPercent, color: Theme.level(volume.usedPercent, base: Module.disk.tint), height: 7)
-                        Text("\(Fmt.storage(volume.used)) von \(Fmt.storage(volume.total)) belegt")
+                        Text("\(Fmt.storage(volume.used)) of \(Fmt.storage(volume.total)) used")
                             .font(.caption).foregroundStyle(.tertiary)
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help("Im Finder öffnen")
+                .help("Open in Finder")
             }
         }
     }
@@ -254,7 +254,7 @@ struct SensorsDetail: View {
         if s.cpu == nil {
             SectionCard {
                 HStack(alignment: .top) {
-                    BigValue(value: s.thermalLabel, caption: "Thermischer Zustand",
+                    BigValue(value: s.thermalLabel, caption: "Thermal state",
                              color: Theme.temperature(40 + s.thermalLevel * 0.55))
                     Spacer()
                     Image(systemName: "thermometer.medium")
@@ -265,40 +265,40 @@ struct SensorsDetail: View {
                 Text(thermalExplanation(s.thermalState))
                     .font(.caption).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                if let t = s.battery { InfoRow(label: "Akku-Temperatur", value: temp(t)) }
+                if let t = s.battery { InfoRow(label: "Battery temperature", value: temp(t)) }
             }
         } else {
         SectionCard {
             HStack(alignment: .top) {
-                BigValue(value: s.cpu.map { temp($0) } ?? "–", caption: "CPU-Temperatur (Ø)",
+                BigValue(value: s.cpu.map { temp($0) } ?? "–", caption: "CPU temperature (avg)",
                          color: s.cpu.map(Theme.temperature) ?? .primary)
                 Spacer()
                 if let max = s.cpuMax {
                     VStack(alignment: .trailing, spacing: 0) {
                         Text(temp(max)).font(.system(.title3, design: .rounded).weight(.semibold)).monospacedDigit()
-                        Text("heißester Kern").font(.caption).foregroundStyle(.secondary)
+                        Text("hottest core").font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
             Sparkline(values: monitor.temperatureHistory.values, maxValue: 105, color: Module.sensors.tint).frame(height: 56)
             HStack {
-                if let t = s.gpu { LegendValue(label: "Grafik", value: temp(t), color: .purple) }
-                if let t = s.battery { LegendValue(label: "Akku", value: temp(t), color: .green) }
+                if let t = s.gpu { LegendValue(label: "Graphics", value: temp(t), color: .purple) }
+                if let t = s.battery { LegendValue(label: "Battery", value: temp(t), color: .green) }
                 if let t = s.ssd { LegendValue(label: "SSD", value: temp(t), color: .indigo) }
             }
-            InfoRow(label: "Thermischer Zustand", value: s.thermalLabel)
+            InfoRow(label: "Thermal state", value: s.thermalLabel)
         }
         }
         if !s.fans.isEmpty {
-            SectionCard(title: "Lüfter") {
+            SectionCard(title: "Fans") {
                 ForEach(s.fans) { fan in
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Image(systemName: "fanblades.fill").foregroundStyle(.cyan.gradient)
                                 .rotationEffect(.degrees(fan.rpm > 0 ? 360 : 0))
-                            Text(s.fans.count > 1 ? (fan.id == 0 ? "Links" : "Rechts") : "Lüfter")
+                            Text(s.fans.count > 1 ? (fan.id == 0 ? String(localized: "Left") : String(localized: "Right")) : String(localized: "Fan"))
                             Spacer()
-                            Text(fan.rpm > 0 ? Fmt.rpm(fan.rpm) : "Aus (passiv)")
+                            Text(fan.rpm > 0 ? Fmt.rpm(fan.rpm) : String(localized: "Off (passive)"))
                                 .monospacedDigit().foregroundStyle(.secondary)
                         }
                         .font(.callout)
@@ -308,21 +308,21 @@ struct SensorsDetail: View {
             }
         }
         if let power = s.systemPower {
-            SectionCard(title: "Leistungsaufnahme") {
+            SectionCard(title: "Power draw") {
                 HStack(alignment: .center) {
-                    BigValue(value: Fmt.watts(power), caption: "gesamtes System")
+                    BigValue(value: Fmt.watts(power), caption: "entire system")
                     Spacer()
                     Sparkline(values: monitor.powerHistory.values, color: .yellow).frame(width: 150, height: 40)
                 }
             }
         }
         if !s.all.isEmpty {
-            SectionCard(title: "Alle Sensoren", trailing: "\(s.all.count)") {
+            SectionCard(title: "All sensors", trailing: "\(s.all.count)") {
                 Button {
                     withAnimation(.snappy) { showAll.toggle() }
                 } label: {
                     HStack {
-                        Text(showAll ? "Weniger anzeigen" : "Alle Temperaturfühler anzeigen")
+                        Text(showAll ? String(localized: "Show less") : String(localized: "Show all temperature sensors"))
                         Spacer()
                         Image(systemName: "chevron.down").rotationEffect(.degrees(showAll ? 180 : 0))
                     }
@@ -347,10 +347,10 @@ struct SensorsDetail: View {
 
     private func thermalExplanation(_ state: ProcessInfo.ThermalState) -> String {
         switch state {
-        case .nominal: "Der Mac arbeitet im normalen Temperaturbereich."
-        case .fair: "Der Mac wird wärmer. Die Lüfter können anlaufen."
-        case .serious: "Der Mac ist heiß und drosselt womöglich die Leistung."
-        case .critical: "Der Mac ist sehr heiß und drosselt die Leistung deutlich."
+        case .nominal: String(localized: "Your Mac is running within its normal temperature range.")
+        case .fair: String(localized: "Your Mac is getting warmer. The fans may spin up.")
+        case .serious: String(localized: "Your Mac is hot and may be reducing performance.")
+        case .critical: String(localized: "Your Mac is very hot and is significantly reducing performance.")
         @unknown default: ""
         }
     }
@@ -381,36 +381,36 @@ struct BatteryDetail: View {
                             .contentTransition(.numericText())
                         Text(b.stateLabel).font(.callout).foregroundStyle(.secondary)
                         if let minutes = b.minutesRemaining, !b.isFullyCharged {
-                            Text((b.isCharging ? "Voll in " : "Noch ") + Fmt.minutes(minutes))
+                            Text(b.isCharging ? String(localized: "Full in \(Fmt.minutes(minutes))") : String(localized: "\(Fmt.minutes(minutes)) remaining"))
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
                     Spacer()
                 }
             }
-            SectionCard(title: "Zustand") {
+            SectionCard(title: "Health") {
                 if let health = b.health {
-                    InfoRow(label: "Maximale Kapazität", value: Fmt.percent(health))
+                    InfoRow(label: "Maximum capacity", value: Fmt.percent(health))
                 }
                 if let condition = b.condition {
-                    InfoRow(label: "Bewertung", value: Self.localizedCondition(condition))
+                    InfoRow(label: "Condition", value: Self.localizedCondition(condition))
                 }
-                if let cycles = b.cycleCount { InfoRow(label: "Ladezyklen", value: "\(cycles)") }
-                if let t = b.temperature { InfoRow(label: "Temperatur", value: Fmt.temperature(t, fahrenheit: prefs.useFahrenheit)) }
+                if let cycles = b.cycleCount { InfoRow(label: "Cycle count", value: "\(cycles)") }
+                if let t = b.temperature { InfoRow(label: "Temperature", value: Fmt.temperature(t, fahrenheit: prefs.useFahrenheit)) }
                 if let power = b.power {
-                    InfoRow(label: power > 0 ? "Ladeleistung" : "Verbrauch", value: Fmt.watts(power))
+                    InfoRow(label: power > 0 ? "Charging power" : "Power usage", value: Fmt.watts(power))
                 }
-                if let adapter = b.adapterWatts { InfoRow(label: "Netzteil", value: "\(adapter)\u{202F}W") }
-                Button("Batterie-Einstellungen …") { Actions.openBatterySettings() }
+                if let adapter = b.adapterWatts { InfoRow(label: "Power adapter", value: "\(adapter)\u{202F}W") }
+                Button("Battery Settings …") { Actions.openBatterySettings() }
                     .buttonStyle(.link)
                     .font(.callout)
             }
         }
-        SectionCard(title: "Bluetooth-Geräte") {
+        SectionCard(title: "Bluetooth devices") {
             if monitor.bluetooth.isEmpty {
                 HStack(spacing: 8) {
                     if !monitor.bluetoothLoaded { ProgressView().controlSize(.small) }
-                    Text(monitor.bluetoothLoaded ? "Keine verbundenen Geräte mit Akkuanzeige" : "Wird geladen …")
+                    Text(monitor.bluetoothLoaded ? String(localized: "No connected devices report a battery level") : String(localized: "Loading …"))
                         .foregroundStyle(.secondary)
                 }
                 .font(.callout)
@@ -442,10 +442,10 @@ struct BatteryDetail: View {
 extension BatteryDetail {
     static func localizedCondition(_ raw: String) -> String {
         switch raw.lowercased() {
-        case "good", "normal": "Gut"
-        case "fair": "Mittel"
-        case "poor": "Schwach"
-        case "check battery", "service battery", "service recommended": "Service empfohlen"
+        case "good", "normal": String(localized: "Good")
+        case "fair": String(localized: "Fair")
+        case "poor": String(localized: "Poor")
+        case "check battery", "service battery", "service recommended": String(localized: "Service recommended")
         default: raw
         }
     }

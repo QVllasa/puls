@@ -7,13 +7,13 @@ enum Module: String, CaseIterable, Identifiable, Hashable {
 
     var title: String {
         switch self {
-        case .cpu: "CPU"
-        case .gpu: "Grafik"
-        case .memory: "Speicher"
-        case .network: "Netzwerk"
-        case .disk: "Festplatte"
-        case .sensors: Flavor.isAppStore ? "Thermik" : "Sensoren"
-        case .battery: "Batterie"
+        case .cpu: String(localized: "CPU")
+        case .gpu: String(localized: "Graphics")
+        case .memory: String(localized: "Memory")
+        case .network: String(localized: "Network")
+        case .disk: String(localized: "Disk")
+        case .sensors: Flavor.isAppStore ? String(localized: "Thermals") : String(localized: "Sensors")
+        case .battery: String(localized: "Battery")
         }
     }
 

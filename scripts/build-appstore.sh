@@ -30,10 +30,11 @@ lipo -create -output "$APP/Contents/MacOS/Puls" \
     .build-store/arm64-apple-macosx/release/Puls .build-store/x86_64-apple-macosx/release/Puls
 strip -x "$APP/Contents/MacOS/Puls"
 sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD/" -e "s/io.github.qvllasa.puls/$BUNDLE_ID/" \
-    -e "s/© 2026 Qendrim Vllasa · MIT-Lizenz/© 2026 Vllasa Ventures UG (haftungsbeschränkt)/" \
+    -e "s/© 2026 Qendrim Vllasa · MIT License/© 2026 Vllasa Ventures UG (haftungsbeschränkt)/" \
     Resources/Info.plist > "$APP/Contents/Info.plist"
 plutil -insert ITSAppUsesNonExemptEncryption -bool NO "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+cp -R Resources/en.lproj Resources/de.lproj "$APP/Contents/Resources/"
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
 

@@ -18,6 +18,10 @@ let package = Package(
                 .linkedFramework("ServiceManagement"),
             ]
         ),
+        .testTarget(
+            name: "PulsTests",
+            dependencies: ["Puls"]
+        ),
     ],
     swiftLanguageModes: [.v5]
 )

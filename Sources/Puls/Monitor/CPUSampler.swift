@@ -36,19 +36,19 @@ final class CPUSampler {
         }
         if result.isEmpty {
             let n = ProcessInfo.processInfo.processorCount
-            result = [CoreGroup(id: 0, name: "Kerne", range: 0..<n)]
+            result = [CoreGroup(id: 0, name: String(localized: "Cores"), range: 0..<n)]
         }
         return result
     }()
 
     private static func localizedGroupName(_ raw: String, level: Int) -> String {
         switch raw.lowercased() {
-        case "efficiency": return "Effizienzkerne"
-        case "performance": return "Leistungskerne"
-        case "super": return "Super-Kerne"
+        case "efficiency": return String(localized: "Efficiency cores")
+        case "performance": return String(localized: "Performance cores")
+        case "super": return String(localized: "Super cores")
         default:
-            if raw.isEmpty { return level == 0 ? "Leistungskerne" : "Effizienzkerne" }
-            return raw.capitalized + "-Kerne"
+            if raw.isEmpty { return level == 0 ? String(localized: "Performance cores") : String(localized: "Efficiency cores") }
+            return String(localized: "\(raw.capitalized) cores")
         }
     }
 

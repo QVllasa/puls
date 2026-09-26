@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         monitor = SystemMonitor(prefs: .shared)
         controller = StatusItemController(monitor: monitor, prefs: .shared)
         monitor.start()
+        UpdateChecker.shared.start()
         enableLaunchAtLoginOnFirstRun()
 
         if CommandLine.arguments.contains("--open") {

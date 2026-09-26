@@ -35,11 +35,11 @@ struct SensorStats: Equatable {
 
     var thermalLabel: String {
         switch thermalState {
-        case .nominal: "Normal"
-        case .fair: "Leicht erhöht"
-        case .serious: "Hoch"
-        case .critical: "Kritisch"
-        @unknown default: "Unbekannt"
+        case .nominal: String(localized: "Normal")
+        case .fair: String(localized: "Slightly elevated")
+        case .serious: String(localized: "High")
+        case .critical: String(localized: "Critical")
+        @unknown default: String(localized: "Unknown")
         }
     }
 
@@ -123,23 +123,23 @@ final class SensorSampler {
 
     static func friendlyName(_ raw: String) -> String {
         let n = raw.lowercased()
-        if n.contains("tdie") { return raw.replacingOccurrences(of: "PMU tdie", with: "CPU-Die ") }
+        let number = raw.filter(\.isNumber)
+        if n.contains("tdie") { return String(localized: "CPU die \(number)") }
         if isGPU(raw), raw.hasPrefix("PMU TP") {
-            return "Grafik " + raw.dropFirst(6).filter(\.isNumber)
+            return String(localized: "Graphics \(String(raw.dropFirst(6).filter(\.isNumber)))")
         }
         if isSoC(raw) { return "SoC " + raw.dropFirst(6).filter(\.isNumber) }
-        if n.contains("tdev") { return raw.replacingOccurrences(of: "PMU tdev", with: "Chip ") }
-        if n.contains("gas gauge battery") { return "Akku" }
-        if n.contains("battery") { return "Akku " + raw.replacingOccurrences(of: "battery", with: "", options: .caseInsensitive).trimmingCharacters(in: .whitespaces) }
+        if n.contains("tdev") { return String(localized: "Chip \(number)") }
+        if n.contains("battery") { return number.isEmpty ? String(localized: "Battery cell") : String(localized: "Battery cell \(number)") }
         if n.contains("nand") {
             let channel = raw.replacingOccurrences(of: "NAND", with: "").replacingOccurrences(of: "temp", with: "")
                 .trimmingCharacters(in: .whitespaces)
             return channel.isEmpty || channel == "CH0" ? "SSD" : "SSD \(channel)"
         }
-        if n.contains("pacc mtr") { return raw.replacingOccurrences(of: "pACC MTR Temp Sensor", with: "Leistungskern ") }
-        if n.contains("eacc mtr") { return raw.replacingOccurrences(of: "eACC MTR Temp Sensor", with: "Effizienzkern ") }
-        if n.contains("gpu mtr") { return raw.replacingOccurrences(of: "GPU MTR Temp Sensor", with: "GPU ") }
-        if n.contains("soc mtr") { return raw.replacingOccurrences(of: "SOC MTR Temp Sensor", with: "SoC ") }
+        if n.contains("pacc mtr") { return String(localized: "Performance core \(number)") }
+        if n.contains("eacc mtr") { return String(localized: "Efficiency core \(number)") }
+        if n.contains("gpu mtr") { return "GPU \(number)" }
+        if n.contains("soc mtr") { return "SoC \(number)" }
         return raw
     }
 
@@ -164,7 +164,7 @@ final class SensorSampler {
         return Self.decode(type: type, bytes: bytes, size: Int(size))
     }
 
-    private static func decode(type: UInt32, bytes: [UInt8], size: Int) -> Double? {
+    static func decode(type: UInt32, bytes: [UInt8], size: Int) -> Double? {
         let fourCC = String(bytes: [24, 16, 8, 0].map { UInt8((type >> $0) & 0xff) }, encoding: .ascii) ?? ""
         switch fourCC {
         case "flt " where size >= 4:

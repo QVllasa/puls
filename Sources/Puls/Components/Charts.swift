@@ -94,6 +94,8 @@ struct RingGauge: View {
                 .rotationEffect(.degrees(-90))
         }
         .animation(.smooth(duration: 0.6), value: value)
+        .accessibilityElement()
+        .accessibilityValue(Text(Fmt.percent(value)))
     }
 }
 
@@ -114,6 +116,8 @@ struct MeterBar: View {
         }
         .frame(height: height)
         .animation(.smooth(duration: 0.5), value: value)
+        .accessibilityElement()
+        .accessibilityValue(Text(Fmt.percent(value)))
     }
 }
 
@@ -146,6 +150,7 @@ struct SegmentBar: View {
         }
         .frame(height: height)
         .animation(.smooth(duration: 0.5), value: segments.map(\.value))
+        .accessibilityHidden(true)
     }
 }
 
@@ -170,5 +175,8 @@ struct CoreBars: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .animation(.smooth(duration: 0.4), value: values)
+        .accessibilityElement()
+        .accessibilityLabel(Text("Load per core"))
+        .accessibilityValue(Text(values.map { Fmt.percent($0) }.joined(separator: ", ")))
     }
 }

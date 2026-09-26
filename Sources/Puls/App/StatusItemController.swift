@@ -24,7 +24,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             button.action = #selector(buttonClicked(_:))
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
             button.imagePosition = .imageOnly
-            button.setAccessibilityLabel("Puls Systemmonitor")
+            button.setAccessibilityLabel(String(localized: "Puls system monitor"))
         }
         state.close = { [weak self] in self?.closePanel() }
         monitor.onUpdate = { [weak self] in self?.updateLabel() }
@@ -60,11 +60,26 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         guard let image = renderer.nsImage else { return }
         image.isTemplate = !prefs.coloredMenuBar
         button.image = image
+        button.setAccessibilityValue(accessibilitySummary())
         let summary = prefs.menuBarMetrics.map(\.title).joined(separator: ", ")
         if summary != lastLabelKey {
             lastLabelKey = summary
-            button.toolTip = "Puls – " + (summary.isEmpty ? "Systemmonitor" : summary)
+            button.toolTip = "Puls – " + (summary.isEmpty ? String(localized: "System monitor") : summary)
         }
+    }
+
+    private func accessibilitySummary() -> String {
+        prefs.menuBarMetrics.map { metric -> String in
+            switch metric {
+            case .cpu: "\(metric.title) \(Fmt.percent(monitor.cpu.total))"
+            case .gpu: "\(metric.title) \(Fmt.percent(monitor.gpu?.utilization ?? 0))"
+            case .memory: "\(metric.title) \(Fmt.percent(monitor.memory.usedPercent))"
+            case .network: String(localized: "Download \(Fmt.rate(monitor.network.download)), upload \(Fmt.rate(monitor.network.upload))")
+            case .disk: "\(metric.title) \(monitor.volumes.first.map { Fmt.storage($0.available) } ?? "–")"
+            case .temperature: "\(metric.title) \(monitor.sensors.headline.map { Fmt.temperature($0, fahrenheit: prefs.useFahrenheit) } ?? "–")"
+            case .battery: "\(metric.title) \(Fmt.percent(monitor.battery?.percent ?? 0))"
+            }
+        }.joined(separator: ", ")
     }
 
     // MARK: Panel
@@ -146,11 +161,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         closePanel()
         let menu = NSMenu()
         menu.delegate = self
-        menu.addItem(item("Puls öffnen", #selector(menuOpen)))
-        menu.addItem(item("Einstellungen …", #selector(menuSettings), key: ","))
-        menu.addItem(item("Aktivitätsanzeige öffnen", #selector(menuActivity)))
+        menu.addItem(item(String(localized: "Open Puls"), #selector(menuOpen)))
+        menu.addItem(item(String(localized: "Settings …"), #selector(menuSettings), key: ","))
+        menu.addItem(item(String(localized: "Open Activity Monitor"), #selector(menuActivity)))
+        if let update = UpdateChecker.shared.available {
+            menu.addItem(item(String(localized: "Download Puls \(update.version) …"), #selector(menuUpdate)))
+        }
         menu.addItem(.separator())
-        menu.addItem(item("Puls beenden", #selector(menuQuit), key: "q"))
+        menu.addItem(item(String(localized: "Quit Puls"), #selector(menuQuit), key: "q"))
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
     }
@@ -169,4 +187,5 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     @objc private func menuSettings() { openPanel(route: .settings) }
     @objc private func menuActivity() { Actions.openActivityMonitor() }
     @objc private func menuQuit() { NSApp.terminate(nil) }
+    @objc private func menuUpdate() { UpdateChecker.shared.openDownload() }
 }

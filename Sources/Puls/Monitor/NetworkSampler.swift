@@ -8,7 +8,7 @@ struct NetworkStats: Equatable {
     var totalReceived: UInt64 = 0     // seit Systemstart, primäre Schnittstelle
     var totalSent: UInt64 = 0
     var interfaceName: String?        // z. B. en0
-    var interfaceKind: String = "Offline"
+    var interfaceKind: String = String(localized: "Offline")
     var localIPv4: String?
     var isConnected: Bool { interfaceName != nil }
 }
@@ -48,18 +48,18 @@ final class NetworkSampler {
 
     private func kind(of bsdName: String) -> String {
         if let cached = kindCache[bsdName] { return cached }
-        var result = "Netzwerk"
+        var result = String(localized: "Network")
         if let interfaces = SCNetworkInterfaceCopyAll() as? [SCNetworkInterface] {
             for interface in interfaces where (SCNetworkInterfaceGetBSDName(interface) as String?) == bsdName {
                 let type = SCNetworkInterfaceGetInterfaceType(interface) as String?
                 if type == (kSCNetworkInterfaceTypeIEEE80211 as String) {
-                    result = "WLAN"
+                    result = String(localized: "Wi-Fi")
                 } else if type == (kSCNetworkInterfaceTypeEthernet as String) {
                     result = "Ethernet"
                 } else if type == (kSCNetworkInterfaceTypeBluetooth as String) {
                     result = "Bluetooth"
                 } else {
-                    result = (SCNetworkInterfaceGetLocalizedDisplayName(interface) as String?) ?? "Netzwerk"
+                    result = (SCNetworkInterfaceGetLocalizedDisplayName(interface) as String?) ?? String(localized: "Network")
                 }
             }
         }

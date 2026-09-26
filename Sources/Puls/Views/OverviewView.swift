@@ -23,6 +23,9 @@ struct OverviewView: View {
             if Flavor.isAppStore && !prefs.loginItemQuestionAnswered {
                 LoginItemPrompt().padding(.bottom, 10)
             }
+            if let update = UpdateChecker.shared.available {
+                UpdateBanner(version: update.version).padding(.bottom, 10)
+            }
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 ForEach(rows, id: \.self) { row in
                     GridRow {
@@ -46,6 +49,7 @@ struct Tile: View {
     @Environment(SystemMonitor.self) private var monitor
     @Environment(Preferences.self) private var prefs
     @State private var hovering = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Button(action: action) {
@@ -89,11 +93,13 @@ struct Tile: View {
             .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120, alignment: .topLeading)
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .card(highlighted: hovering)
-            .scaleEffect(hovering ? 1.015 : 1)
+            .scaleEffect(hovering && !reduceMotion ? 1.015 : 1)
         }
         .buttonStyle(.plain)
         .onHover { h in withAnimation(.snappy(duration: 0.18)) { hovering = h } }
         .accessibilityLabel("\(module.title): \(value)")
+        .accessibilityValue(subtitle ?? "")
+        .accessibilityHint(Text("Shows details"))
     }
 
     private var symbol: String {
@@ -120,27 +126,27 @@ struct Tile: View {
     private var subtitle: String? {
         switch module {
         case .cpu:
-            return "Last \(Fmt.load(monitor.cpu.load[0])) · \(monitor.cpu.cores.count) Kerne"
+            return String(localized: "Load \(Fmt.load(monitor.cpu.load[0])) · \(monitor.cpu.cores.count) cores")
         case .gpu:
-            return monitor.gpu.map { "\(Fmt.memory($0.memoryInUse)) belegt" }
+            return monitor.gpu.map { String(localized: "\(Fmt.memory($0.memoryInUse)) in use") }
         case .memory:
-            return "\(Fmt.memory(monitor.memory.used)) von \(Fmt.memory(monitor.memory.total))"
+            return String(localized: "\(Fmt.memory(monitor.memory.used)) of \(Fmt.memory(monitor.memory.total))")
         case .network:
-            return monitor.network.isConnected ? "↑ \(Fmt.rate(monitor.network.upload))" : "Keine Verbindung"
+            return monitor.network.isConnected ? "↑ \(Fmt.rate(monitor.network.upload))" : String(localized: "Not connected")
         case .disk:
-            return monitor.volumes.first.map { "frei · \($0.name)" }
+            return monitor.volumes.first.map { String(localized: "free · \($0.name)") }
         case .sensors:
             var parts: [String] = []
             if monitor.sensors.headline == nil, let t = monitor.sensors.battery {
-                parts.append("Akku \(Fmt.temperature(t, fahrenheit: prefs.useFahrenheit))")
+                parts.append(String(localized: "Battery \(Fmt.temperature(t, fahrenheit: prefs.useFahrenheit))"))
             }
-            if let fan = monitor.sensors.fans.first { parts.append(fan.rpm > 0 ? Fmt.rpm(fan.rpm) : "Lüfter aus") }
+            if let fan = monitor.sensors.fans.first { parts.append(fan.rpm > 0 ? Fmt.rpm(fan.rpm) : String(localized: "Fans off")) }
             if let p = monitor.sensors.systemPower { parts.append(Fmt.watts(p)) }
-            return parts.isEmpty ? "Thermischer Zustand" : parts.joined(separator: " · ")
+            return parts.isEmpty ? String(localized: "Thermal state") : parts.joined(separator: " · ")
         case .battery:
             guard let b = monitor.battery else { return nil }
             if let minutes = b.minutesRemaining, !b.isFullyCharged {
-                return b.stateLabel + " · " + (b.isCharging ? "voll in " : "noch ") + Fmt.minutes(minutes)
+                return b.stateLabel + " · " + (b.isCharging ? String(localized: "full in \(Fmt.minutes(minutes))") : String(localized: "\(Fmt.minutes(minutes)) left"))
             }
             return b.stateLabel
         }
@@ -162,7 +168,7 @@ struct Tile: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Spacer(minLength: 0)
                     MeterBar(value: v.usedPercent, color: module.tint, height: 7)
-                    Text("\(Fmt.percent(v.usedPercent)) belegt von \(Fmt.storage(v.total))")
+                    Text("\(Fmt.percent(v.usedPercent)) used of \(Fmt.storage(v.total))")
                         .font(.caption2).foregroundStyle(.tertiary)
                 }
             }
@@ -191,17 +197,17 @@ struct LoginItemPrompt: View {
                     .font(.system(size: 22))
                     .foregroundStyle(.green.gradient)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("Mit dem Mac starten?").font(.callout.weight(.semibold))
-                    Text("Puls öffnet sich dann nach jeder Anmeldung automatisch in der Menüleiste.")
+                    Text("Open at login?").font(.callout.weight(.semibold))
+                    Text("Puls will then start automatically in the menu bar every time you log in.")
                         .font(.caption).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
             HStack {
                 Spacer()
-                Button("Nein danke") { answer(false) }
+                Button("No thanks") { answer(false) }
                     .buttonStyle(.glass)
-                Button("Automatisch starten") { answer(true) }
+                Button("Open at login") { answer(true) }
                     .buttonStyle(.glassProminent)
             }
             .controlSize(.small)
@@ -215,5 +221,31 @@ struct LoginItemPrompt: View {
             prefs.launchAtLogin = enable
             prefs.loginItemQuestionAnswered = true
         }
+    }
+}
+
+/// Hinweis auf eine neuere Version (nur GitHub-Version).
+struct UpdateBanner: View {
+    var version: String
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(.blue.gradient)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Puls \(version) is available").font(.callout.weight(.semibold))
+                Text("You are using version \(Bundle.main.shortVersion).")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Download") { UpdateChecker.shared.openDownload() }
+                .buttonStyle(.glassProminent)
+                .controlSize(.small)
+        }
+        .padding(12)
+        .card()
+        .accessibilityElement(children: .combine)
     }
 }

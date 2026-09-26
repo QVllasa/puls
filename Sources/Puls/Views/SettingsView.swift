@@ -6,7 +6,7 @@ struct SettingsView: View {
     var body: some View {
         @Bindable var prefs = prefs
         VStack(spacing: 10) {
-            SectionCard(title: "In der Menüleiste zeigen") {
+            SectionCard(title: "Show in menu bar") {
                 ForEach(MenuBarMetric.available) { metric in
                     HStack(spacing: 10) {
                         MenuBarMetricIcon(metric: metric)
@@ -20,12 +20,12 @@ struct SettingsView: View {
                     .font(.callout)
                 }
                 Divider().opacity(0.5)
-                SwitchRow(title: "Farbige Indikatoren", isOn: $prefs.coloredMenuBar)
+                SwitchRow(title: "Colored indicators", isOn: $prefs.coloredMenuBar)
                     .font(.callout)
             }
-            SectionCard(title: "Allgemein") {
+            SectionCard(title: "General") {
                 HStack {
-                    Text("Aktualisierung")
+                    Text("Update interval")
                     Spacer()
                     Picker("", selection: $prefs.refreshInterval) {
                         Text("1 s").tag(1.0)
@@ -37,7 +37,7 @@ struct SettingsView: View {
                     .frame(width: 150)
                 }
                 HStack {
-                    Text("Temperatur")
+                    Text("Temperature")
                     Spacer()
                     Picker("", selection: $prefs.useFahrenheit) {
                         Text("°C").tag(false)
@@ -47,18 +47,22 @@ struct SettingsView: View {
                     .labelsHidden()
                     .frame(width: 100)
                 }
-                SwitchRow(title: "Öffentliche IP-Adresse abrufen", isOn: $prefs.fetchPublicIP)
-                SwitchRow(title: "Beim Anmelden starten", isOn: $prefs.launchAtLogin)
+                SwitchRow(title: "Show public IP address", isOn: $prefs.fetchPublicIP)
+                SwitchRow(title: "Open at login", isOn: $prefs.launchAtLogin)
+                if !Flavor.isAppStore {
+                    SwitchRow(title: "Check for updates", isOn: $prefs.checkForUpdates)
+                        .onChange(of: prefs.checkForUpdates) { Task { await UpdateChecker.shared.check() } }
+                }
             }
             .font(.callout)
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Puls \(Bundle.main.shortVersion)").font(.callout.weight(.semibold))
-                    Text("Rechtsklick auf das Menüleisten-Symbol öffnet das Menü")
+                    Text("Right-click the menu bar item to open the menu")
                         .font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button("Beenden") { NSApp.terminate(nil) }
+                Button("Quit") { NSApp.terminate(nil) }
                     .buttonStyle(.glass)
                     .keyboardShortcut("q")
             }
@@ -74,7 +78,7 @@ struct SwitchRow: View {
 
     var body: some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
             Spacer()
             Toggle(title, isOn: $isOn).labelsHidden().toggleStyle(.switch).controlSize(.small)
         }
