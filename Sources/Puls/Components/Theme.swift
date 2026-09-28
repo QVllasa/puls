@@ -82,9 +82,10 @@ enum PanelMetrics {
     static let cornerRadius: CGFloat = 30
     /// Durchsichtiger Rand ums Glas: Liquid Glass zeichnet seinen Schatten außerhalb der runden Form.
     /// Füllte das Glas das Fenster ganz aus, schnitte der rechteckige Fensterrand diesen Schatten ab
-    /// und hinter den runden Ecken bliebe ein eckiger Rahmen stehen. Gemessen reicht der Schatten
-    /// oben 25, seitlich 33 und unten 41 Punkt weit.
-    static let shadowInsets = NSEdgeInsets(top: 28, left: 36, bottom: 44, right: 36)
+    /// und hinter den runden Ecken bliebe ein eckiger Rahmen stehen. Gemessen unter macOS 27 ist der
+    /// Schatten oben nach 32, seitlich nach 40 und unten nach 48 Punkt ganz verschwunden (macOS 26
+    /// etwas früher); dazu je 4 Punkt Reserve.
+    static let shadowInsets = NSEdgeInsets(top: 36, left: 44, bottom: 52, right: 44)
 
     /// Lage des Glases im Fenster (AppKit-Koordinaten, Ursprung unten links).
     static var glassFrameInWindow: CGRect {
