@@ -124,6 +124,12 @@ struct MenuBarLabel: View {
         }
     }
 
+    /// Position der Maus im Bild des Symbols (Punkte ab linkem Bildrand). `button` ist das Symbol in
+    /// Bildschirmkoordinaten, das Bild sitzt mittig darin.
+    static func imageX(mouseX: CGFloat, button: CGRect, imageWidth: CGFloat) -> CGFloat {
+        mouseX - button.minX - (button.width - imageWidth) / 2
+    }
+
     /// Welcher Wert liegt an Position x (Punkte ab linkem Bildrand)? Der Abstand zwischen zwei Werten
     /// gehört je zur Hälfte zum linken und zum rechten Nachbarn.
     static func segment(at x: CGFloat, widths: [CGFloat]) -> Int? {

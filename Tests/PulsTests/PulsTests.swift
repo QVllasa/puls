@@ -163,6 +163,16 @@ struct PanelTests {
         #expect(MenuBarLabel.segment(at: 10, widths: []) == nil)
     }
 
+    @Test func clickPositionComesFromTheMouseNotTheEvent() {
+        // macOS 27 meldet jeden Klick in der Mitte des Symbols; gemessen wird deshalb die Mausposition.
+        let button = CGRect(x: 1209, y: 1084, width: 174, height: 22) // Symbol auf dem Bildschirm
+        let widths: [CGFloat] = [37, 37, 62] // CPU, RAM, Netzwerk; Bild 158 Punkt breit, mittig
+        let cpu = MenuBarLabel.imageX(mouseX: 1232, button: button, imageWidth: 158)
+        let network = MenuBarLabel.imageX(mouseX: 1358, button: button, imageWidth: 158)
+        #expect(MenuBarLabel.segment(at: cpu, widths: widths) == 0)
+        #expect(MenuBarLabel.segment(at: network, widths: widths) == 2)
+    }
+
     @Test func everyMenuBarMetricOpensAMatchingDetailView() {
         #expect(MenuBarMetric.cpu.module == .cpu)
         #expect(MenuBarMetric.gpu.module == .gpu)

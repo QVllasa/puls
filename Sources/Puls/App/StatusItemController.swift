@@ -110,12 +110,19 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     /// Die Detailansicht des Werts unter dem Mauszeiger, ohne Werte in der Menüleiste die Übersicht.
+    /// Die Position kommt von der Maus, nicht vom Ereignis: macOS 27 meldet jeden Klick auf ein
+    /// Menüleistensymbol in dessen Mitte.
     private func clickedRoute(_ button: NSStatusBarButton) -> Route {
-        guard let event = NSApp.currentEvent, let image = button.image else { return .overview }
+        guard let image = button.image, let onScreen = buttonFrameOnScreen() else { return .overview }
         let label = MenuBarLabel(monitor: monitor, prefs: prefs)
-        let x = button.convert(event.locationInWindow, from: nil).x - (button.bounds.width - image.size.width) / 2
+        let x = MenuBarLabel.imageX(mouseX: NSEvent.mouseLocation.x, button: onScreen, imageWidth: image.size.width)
         guard let index = MenuBarLabel.segment(at: x, widths: label.itemWidths()) else { return .overview }
         return .detail(prefs.menuBarMetrics[index].module)
+    }
+
+    private func buttonFrameOnScreen() -> NSRect? {
+        guard let button = statusItem.button, let window = button.window else { return nil }
+        return window.convertToScreen(button.convert(button.bounds, to: nil))
     }
 
     func openPanel(route: Route? = nil) {
@@ -132,7 +139,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         statusItem.button?.highlight(true)
 
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            Task { @MainActor in self?.closePanel() }
+            let mouse = NSEvent.mouseLocation
+            Task { @MainActor in
+                // Seit macOS 27 zeichnet ein anderer Prozess die Menüleiste; ein Klick auf das eigene
+                // Symbol kommt dann hier an. Den behandelt buttonClicked, er ist kein Klick daneben.
+                guard let self, !(self.statusItem.button?.window?.frame.contains(mouse) ?? false) else { return }
+                self.closePanel()
+            }
         }
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown]) { [weak self] event in
             guard let self else { return event }
