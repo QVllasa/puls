@@ -98,6 +98,11 @@ h3 { font-size: 1.2rem; line-height: 1.3; letter-spacing: -0.01em; font-weight: 
 .hero h1 { margin-bottom: 1.2rem; }
 .download { margin-top: 2rem; }
 .download.center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.download-options { display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem; }
+.download.center .download-options { justify-content: center; }
+.store-badge { display: inline-flex; border-radius: 10px; transition: transform 160ms var(--ease-out); }
+.store-badge img { display: block; width: auto; height: 48px; }
+.store-badge:active { transform: scale(0.98); }
 .button {
   display: inline-flex; align-items: center; justify-content: center;
   min-height: 48px; padding: 0 1.6rem; border-radius: 999px;

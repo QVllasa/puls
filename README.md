@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/QVllasa/puls/releases/latest"><b>⬇︎ Download Puls</b></a> ·
+  <a href="https://apps.apple.com/app/id6816280109"><b>Mac App Store</b></a> ·
   <a href="https://qvllasa.github.io/puls/">Website</a> ·
   macOS 26 Tahoe · Apple silicon &amp; Intel · English &amp; German · free &amp; open source (MIT)
 </p>
@@ -57,7 +58,7 @@
 
 ## GitHub version or Mac App Store?
 
-| | GitHub (this repo) | Mac App Store |
+| | [GitHub (this repo)](https://github.com/QVllasa/puls/releases/latest) | [Mac App Store](https://apps.apple.com/app/id6816280109) |
 |---|---|---|
 | Price | free | free |
 | CPU / GPU / memory / network / disk / battery | ✓ | ✓ |
@@ -69,6 +70,8 @@
 | Code signing | Developer ID, notarized by Apple | App Store |
 
 Please install only one of them; both are called “Puls”.
+
+<p align="center"><a href="https://apps.apple.com/app/id6816280109"><img src="docs/assets/mac-app-store-en-black.svg" height="48" alt="Download on the Mac App Store"></a></p>
 
 ## Usage
 

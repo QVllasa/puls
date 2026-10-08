@@ -15,6 +15,7 @@ BASE = "https://qvllasa.github.io/puls"
 VERSION = (ROOT / "VERSION").read_text().strip()
 REPO = "https://github.com/QVllasa/puls"
 DOWNLOAD = f"{REPO}/releases/latest/download/Puls-{VERSION}.zip"
+APPSTORE = "https://apps.apple.com/app/id6816280109"
 zip_path = ROOT / f"dist/Puls-{VERSION}.zip"
 SIZE_MB = f"{zip_path.stat().st_size / 1_000_000:.1f}" if zip_path.exists() else "2.3"
 
@@ -48,9 +49,9 @@ STRINGS = {
         "description": "Puls shows CPU, graphics, memory, network, disk and battery live in your Mac menu bar, in a calm Liquid Glass panel made for macOS Tahoe. Free and open source.",
         "hero_title": "Your Mac, at a glance.",
         "hero_lead": "Puls sits in your menu bar and shows what your Mac is doing right now: processor, graphics, memory, network, disk, thermals and battery. One click opens the details.",
-        "download": "Download for Mac",
-        "download_meta": f"Version {VERSION}, {SIZE_MB} MB, free. Requires macOS 26 Tahoe on Apple silicon or Intel.",
-        "appstore_note": "Coming soon to the Mac App Store.",
+        "download": "Download from GitHub",
+        "download_meta": f"Both free. Requires macOS 26 Tahoe on Apple silicon or Intel. GitHub download: version {VERSION}, {SIZE_MB} MB.",
+        "appstore_alt": "Download on the Mac App Store",
         "stage_alt": "The Puls panel opened from the menu bar, with tiles for CPU, graphics, memory, network, disk, sensors and battery",
         "menubar_alt": "Puls in the menu bar showing CPU, memory, network and battery",
         "explore_title": "Every part of your Mac, one click deeper.",
@@ -114,9 +115,9 @@ STRINGS = {
         "description": "Puls zeigt CPU, Grafik, Speicher, Netzwerk, Festplatte und Akku live in der Mac-Menüleiste, in einem ruhigen Liquid-Glass-Panel für macOS Tahoe. Kostenlos und Open Source.",
         "hero_title": "Dein Mac auf einen Blick.",
         "hero_lead": "Puls sitzt in der Menüleiste und zeigt, was dein Mac gerade tut: Prozessor, Grafik, Speicher, Netzwerk, Festplatte, Thermik und Akku. Ein Klick öffnet die Details.",
-        "download": "Für Mac laden",
-        "download_meta": f"Version {VERSION}, {SIZE_MB.replace('.', ',')} MB, kostenlos. Braucht macOS 26 Tahoe auf Apple Silicon oder Intel.",
-        "appstore_note": "Bald auch im Mac App Store.",
+        "download": "Bei GitHub laden",
+        "download_meta": f"Beide kostenlos. Braucht macOS 26 Tahoe auf Apple Silicon oder Intel. GitHub-Download: Version {VERSION}, {SIZE_MB.replace('.', ',')} MB.",
+        "appstore_alt": "Laden im Mac App Store",
         "stage_alt": "Das Puls-Panel, aus der Menüleiste geöffnet, mit Kacheln für CPU, Grafik, Speicher, Netzwerk, Festplatte, Sensoren und Batterie",
         "menubar_alt": "Puls in der Menüleiste mit CPU, Speicher, Netzwerk und Akku",
         "explore_title": "Jeder Bereich deines Mac, einen Klick tiefer.",
@@ -243,7 +244,7 @@ def head(t: dict, page: str, title: str, description: str, prefix: str) -> str:
         data = {
             "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Puls",
             "operatingSystem": "macOS 26", "applicationCategory": "UtilitiesApplication",
-            "softwareVersion": VERSION, "downloadUrl": DOWNLOAD, "url": url, "inLanguage": ["en", "de"],
+            "softwareVersion": VERSION, "downloadUrl": DOWNLOAD, "installUrl": APPSTORE, "url": url, "inLanguage": ["en", "de"],
             "image": f"{BASE}/assets/icon.png", "screenshot": f"{BASE}/screenshots/{t['lang']}/overview-dark.png",
             "description": t["description"], "license": "https://opensource.org/licenses/MIT",
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
@@ -318,10 +319,17 @@ def footer(t: dict, prefix: str) -> str:
 """
 
 
-def download_block(t: dict, cls: str = "") -> str:
+def download_block(t: dict, prefix: str, cls: str = "") -> str:
+    badge = f"{prefix}assets/mac-app-store-{t['lang']}"
     return f"""<div class="download {cls}">
-      <a class="button" href="{DOWNLOAD}">{t['download']}</a>
-      <p class="meta">{t['download_meta']}<br>{t['appstore_note']}</p>
+      <div class="download-options">
+        <a class="button" href="{DOWNLOAD}">{t['download']}</a>
+        <a class="store-badge" href="{APPSTORE}"><picture>
+          <source srcset="{badge}-white.svg" media="(prefers-color-scheme: dark)">
+          <img src="{badge}-black.svg" alt="{t['appstore_alt']}" width="187" height="48">
+        </picture></a>
+      </div>
+      <p class="meta">{t['download_meta']}</p>
     </div>"""
 
 
@@ -362,7 +370,7 @@ def index_page(t: dict) -> str:
     <img class="app-icon" src="{prefix}assets/icon.png" alt="" width="112" height="112">
     <h1>{t['hero_title']}</h1>
     <p class="lead">{t['hero_lead']}</p>
-    {download_block(t)}
+    {download_block(t, prefix)}
   </div>
   <figure class="stage">
     <div class="menubar" aria-hidden="true">
@@ -436,7 +444,7 @@ def index_page(t: dict) -> str:
 <section class="closing" aria-labelledby="closing-title">
   <img class="app-icon" src="{prefix}assets/icon.png" alt="" width="96" height="96" loading="lazy">
   <h2 id="closing-title">{t['closing_title']}</h2>
-  {download_block(t, 'center')}
+  {download_block(t, prefix, 'center')}
   <p class="source"><a href="{REPO}">{t['source']}</a></p>
 </section>
 </main>
