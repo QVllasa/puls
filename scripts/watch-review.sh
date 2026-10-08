@@ -2,6 +2,7 @@
 # Beobachtet den App-Review-Status und endet, sobald Apple entschieden hat.
 cd "$(dirname "$0")/.."
 source ~/.appstore-puls/env.sh
+export DEVELOPER_DIR=/Library/Developer/CommandLineTools
 last=""
 for i in $(seq 1 864); do   # bis zu 72 Stunden, alle 5 Minuten
     s=$(uv run -q scripts/asc_submit.py status 2>/dev/null | tail -1)

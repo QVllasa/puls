@@ -19,15 +19,17 @@ OUT="dist-store"
 APP="$OUT/Puls.app"
 
 echo "▸ Kompiliere Store-Version $VERSION (Build $BUILD) …"
+# Je Architektur sofort sichern: Neuere Werkzeuge legen beide am selben Ort ab.
+mkdir -p .build-store/lipo
 for arch in arm64 x86_64; do
-    swift build -c release --arch "$arch" --build-path .build-store \
-        -Xswiftc -DAPPSTORE -Xcc -DAPPSTORE -Xswiftc -Osize >/dev/null
+    FLAGS=(-c release --arch "$arch" --build-path .build-store -Xswiftc -DAPPSTORE -Xcc -DAPPSTORE -Xswiftc -Osize)
+    swift build "${FLAGS[@]}" >/dev/null
+    cp "$(swift build "${FLAGS[@]}" --show-bin-path)/Puls" ".build-store/lipo/Puls-$arch"
 done
 
 echo "▸ Setze App-Paket zusammen …"
 rm -rf "$OUT" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-lipo -create -output "$APP/Contents/MacOS/Puls" \
-    .build-store/arm64-apple-macosx/release/Puls .build-store/x86_64-apple-macosx/release/Puls
+lipo -create -output "$APP/Contents/MacOS/Puls" .build-store/lipo/Puls-arm64 .build-store/lipo/Puls-x86_64
 strip -x "$APP/Contents/MacOS/Puls"
 sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD/" -e "s/io.github.qvllasa.puls/$BUNDLE_ID/" \
     -e "s/© 2026 Qendrim Vllasa · MIT License/© 2026 Vllasa Ventures UG (haftungsbeschränkt)/" \

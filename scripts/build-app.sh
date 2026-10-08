@@ -10,15 +10,16 @@ BUILD="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 APP="dist/Puls.app"
 
 echo "▸ Kompiliere Puls $VERSION (Build $BUILD) …"
+# Je Architektur sofort sichern: Neuere Werkzeuge legen beide am selben Ort ab.
+mkdir -p .build/lipo
 for arch in arm64 x86_64; do
     swift build -c release --arch "$arch" -Xswiftc -Osize >/dev/null
+    cp "$(swift build -c release --arch "$arch" -Xswiftc -Osize --show-bin-path)/Puls" ".build/lipo/Puls-$arch"
 done
 
 echo "▸ Setze App-Paket zusammen …"
 rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-lipo -create -output "$APP/Contents/MacOS/Puls" \
-    .build/arm64-apple-macosx/release/Puls \
-    .build/x86_64-apple-macosx/release/Puls
+lipo -create -output "$APP/Contents/MacOS/Puls" .build/lipo/Puls-arm64 .build/lipo/Puls-x86_64
 strip -x "$APP/Contents/MacOS/Puls"
 sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD/" Resources/Info.plist > "$APP/Contents/Info.plist"
 cp Resources/compiled/AppIcon.icns Resources/compiled/Assets.car "$APP/Contents/Resources/"
